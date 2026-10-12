@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Orders - Admin</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .admin-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .admin-header {
+        margin-bottom: 2rem;
+      }
+      .admin-header h1 {
+        color: var(--primary);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .admin-header p {
+        color: var(--text-light);
+      }
+      .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+      .filter-tab {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 2px solid var(--gray-200);
+        background: white;
+        color: var(--text-dark);
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+      }
+      .filter-tab:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .filter-tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      .orders-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+      .orders-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .orders-table th {
+        background: var(--primary);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .orders-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.9rem;
+      }
+      .orders-table tr:last-child td {
+        border-bottom: none;
+      }
+      .orders-table tr:hover {
+        background: var(--gray-50);
+      }
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-confirmed {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .status-ready {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+      .status-completed {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .action-btns {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+      }
+      .btn-sm {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-view {
+        background: #6b7280;
+        color: white;
+      }
+      .btn-view:hover {
+        background: #4b5563;
+      }
+      .btn-confirm {
+        background: #3b82f6;
+        color: white;
+      }
+      .btn-confirm:hover {
+        background: #2563eb;
+      }
+      .btn-ready {
+        background: #8b5cf6;
+        color: white;
+      }
+      .btn-ready:hover {
+        background: #7c3aed;
+      }
+      .btn-complete {
+        background: var(--success);
+        color: white;
+      }
+      .btn-complete:hover {
+        background: #059669;
+      }
+      .btn-cancel {
+        background: var(--danger);
+        color: white;
+      }
+      .btn-cancel:hover {
+        background: #dc2626;
+      }
+      /* Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .modal.show {
+        display: flex;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .modal-header h2 {
+        color: var(--primary);
+        font-size: 1.5rem;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-100);
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-label {
+        color: var(--text-light);
+        font-weight: 500;
+      }
+      .detail-value {
+        color: var(--text-dark);
+        font-weight: 600;
+      }
+      .order-items-list {
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--gray-50);
+        border-radius: 8px;
+      }
+      .order-item-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .order-item-row:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        color: var(--primary);
+      }
+      .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .alert.show {
+        display: block;
+      }
+      .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+      }
+      .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="../index.html" class="navbar-brand">🥓 Boss Rainier Chicharon</a>
+      <ul class="navbar-nav">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html">Orders</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+        <li><a href="users.html">Users</a></li>
+        <li><a href="payments.html">Payments</a></li>
+        <li>
+          <a
+            href="#"
+            onclick="
+              logout();
+              return false;
+            "
+            >Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <!-- ADMIN ORDERS -->
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1>🛒 Manage Orders</h1>
+        <p>View and update order status</p>
+      </div>
+
+      <div id="alert" class="alert"></div>
+
+      <!-- FILTER TABS -->
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-status="all">All</button>
+        <button class="filter-tab" data-status="pending">Pending</button>
+        <button class="filter-tab" data-status="confirmed">Confirmed</button>
+        <button class="filter-tab" data-status="ready">Ready</button>
+        <button class="filter-tab" data-status="completed">Completed</button>
+        <button class="filter-tab" data-status="cancelled">Cancelled</button>
+      </div>
+
+      <div class="orders-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Pick-up</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orders-body">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 2rem">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDER DETAILS MODAL -->
+    <div id="order-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Order Details</h2>
+          <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="order-details"></div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/admin/admin-auth.js"></script>
+    <script src="../js/admin/admin-orders.js"></script>
+  </body>
+</html>

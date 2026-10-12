@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boss Rainier Chicharon - Home</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">🥓 Boss Rainier Chicharon</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li>
+          <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        </li>
+        <li id="auth-links">
+          <a href="login.html">Login</a>
+          <a href="register.html">Register</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <div class="container">
+      <div class="hero">
+        <h1>Boss Rainier Chicharon</h1>
+        <p>Signature chicharon ni Mrs. Marissa Del Rosario</p>
+        <a href="products.html" class="btn btn-secondary">Shop Now →</a>
+      </div>
+
+      <!-- FEATURED PRODUCTS -->
+      <h2 style="margin: 2rem 0 1rem; color: var(--primary)">
+        Featured Products
+      </h2>
+      <div id="featured-products" class="grid grid-3">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+      <p>Patubig, Marilao, Bulacan</p>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script>
+      // Update cart count
+      document.getElementById("cart-count").textContent = getCartCount();
+
+      // Check if logged in
+      const user = getCurrentUser();
+      if (user) {
+        document.getElementById("auth-links").innerHTML = `
+        <span style="color: white;">Hi, ${user.full_name}!</span>
+        <a href="#" onclick="logout(); return false;">Logout</a>
+      `;
+      }
+
+      // Load featured products
+      async function loadProducts() {
+        const result = await apiCall("/products");
+        const container = document.getElementById("featured-products");
+
+        if (!result.success || result.data.length === 0) {
+          container.innerHTML = '<p class="loading">No products available.</p>';
+          return;
+        }
+
+        const products = result.data.slice(0, 6);
+        container.innerHTML = products
+          .map(
+            (product) => `
+        <div class="card">
+          <h3 class="card-title">${product.name}</h3>
+          <p class="card-description">${product.description || "No description"}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <span class="card-price">${formatPrice(product.price)}</span>
+            <span class="badge ${product.stock_quantity > 0 ? "badge-success" : "badge-danger"}">
+              ${product.stock_quantity > 0 ? `Stock: ${product.stock_quantity}` : "Out of Stock"}
+            </span>
+          </div>
+          <a href="products.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem; display: block;">
+            View Products
+          </a>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      loadProducts();
+    </script>
+  </body>
+</html>

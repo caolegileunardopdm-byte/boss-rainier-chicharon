@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Boss Rainier Chicharon</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .auth-container {
+        max-width: 480px;
+        margin: 4rem auto;
+        padding: 2.5rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+      .auth-container h1 {
+        color: var(--primary);
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+      }
+      .auth-container > p {
+        text-align: center;
+        color: var(--text-light);
+        margin-bottom: 2rem;
+      }
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        background: white;
+        color: var(--text-dark);
+        font-family: inherit;
+        box-sizing: border-box;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 480px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+      .auth-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--text-light);
+        font-size: 0.95rem;
+      }
+      .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.95rem;
+      }
+      .alert.show {
+        display: block;
+      }
+      .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+      }
+      .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+      .required {
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">🥓 Boss Rainier Chicharon</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li>
+          <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        </li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html">Register</a></li>
+      </ul>
+    </nav>
+
+    <!-- REGISTER FORM -->
+    <div class="auth-container">
+      <h1>Create Account</h1>
+      <p>Sign up to start ordering</p>
+
+      <div id="alert" class="alert"></div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label for="full_name"
+            >Full Name <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="full_name"
+            placeholder="Juan Dela Cruz"
+            required
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input
+              type="email"
+              id="email"
+              placeholder="juan@example.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="username"
+              >Username <span class="required">*</span></label
+            >
+            <input type="text" id="username" placeholder="juandc" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password"
+              >Password <span class="required">*</span></label
+            >
+            <input
+              type="password"
+              id="password"
+              placeholder="Min 6 characters"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="text" id="phone" placeholder="09171234567" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address</label>
+          <textarea
+            id="address"
+            rows="2"
+            placeholder="Marilao, Bulacan"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="width: 100%; margin-top: 0.5rem"
+        >
+          Register
+        </button>
+      </form>
+
+      <p class="auth-link">
+        Already have an account? <a href="login.html">Login here</a>
+      </p>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+      document.getElementById("cart-count").textContent = getCartCount();
+    </script>
+  </body>
+</html>

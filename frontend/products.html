@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products - Boss Rainier Chicharon</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">🥓 Boss Rainier Chicharon</a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li>
+          <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        </li>
+        <li id="auth-links">
+          <a href="login.html">Login</a>
+          <a href="register.html">Register</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+      <h1 style="color: var(--primary); margin-bottom: 0.5rem">Our Products</h1>
+      <p style="color: var(--text-light); margin-bottom: 2rem">
+        Signature chicharon ni Mrs. Marissa Del Rosario
+      </p>
+
+      <!-- SEARCH & FILTER -->
+      <div
+        style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap"
+      >
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search products..."
+          style="
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+          "
+        />
+        <select
+          id="category-filter"
+          style="
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+          "
+        >
+          <option value="">All Categories</option>
+        </select>
+      </div>
+
+      <!-- PRODUCTS GRID -->
+      <div id="products-grid" class="grid grid-3">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+      <p>Patubig, Marilao, Bulacan</p>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/products.js"></script>
+  </body>
+</html>

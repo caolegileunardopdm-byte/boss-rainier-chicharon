@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Payments - Admin</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+      .admin-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .admin-header {
+        margin-bottom: 2rem;
+      }
+      .admin-header h1 {
+        color: var(--primary);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .admin-header p {
+        color: var(--text-light);
+      }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .mini-stat {
+        background: white;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .mini-stat-icon {
+        font-size: 1.75rem;
+      }
+      .mini-stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+      }
+      .mini-stat-label {
+        color: var(--text-light);
+        font-size: 0.85rem;
+      }
+      .payments-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+      .payments-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .payments-table th {
+        background: var(--primary);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .payments-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.9rem;
+      }
+      .payments-table tr:last-child td {
+        border-bottom: none;
+      }
+      .payments-table tr:hover {
+        background: var(--gray-50);
+      }
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-paid {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-failed {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .status-refunded {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+      .method-badge {
+        padding: 0.25rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        background: var(--gray-100);
+        color: var(--text-dark);
+        font-weight: 500;
+      }
+      .action-btns {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+      }
+      .btn-sm {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.8rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-paid {
+        background: var(--success);
+        color: white;
+      }
+      .btn-paid:hover {
+        background: #059669;
+      }
+      .btn-refund {
+        background: #8b5cf6;
+        color: white;
+      }
+      .btn-refund:hover {
+        background: #7c3aed;
+      }
+      .btn-delete {
+        background: var(--danger);
+        color: white;
+      }
+      .btn-delete:hover {
+        background: #dc2626;
+      }
+      .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .alert.show {
+        display: block;
+      }
+      .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+      }
+      .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <a href="../index.html" class="navbar-brand">🥓 Boss Rainier Chicharon</a>
+      <ul class="navbar-nav">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html">Orders</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+        <li><a href="users.html">Users</a></li>
+        <li><a href="payments.html">Payments</a></li>
+        <li>
+          <a
+            href="#"
+            onclick="
+              logout();
+              return false;
+            "
+            >Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1>💰 Manage Payments</h1>
+        <p>View and manage payment records</p>
+      </div>
+
+      <div id="alert" class="alert"></div>
+
+      <div class="stats-row" id="stats-row">
+        <div class="loading" style="grid-column: 1 / -1">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div class="payments-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Payment ID</th>
+              <th>Order ID</th>
+              <th>Method</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="payments-body">
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 2rem">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/admin/admin-auth.js"></script>
+    <script src="../js/admin/admin-payments.js"></script>
+  </body>
+</html>
