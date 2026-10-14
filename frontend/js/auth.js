@@ -19,6 +19,23 @@ function switchTab(tab) {
     alertEl.textContent = "";
   }
 
+  // ==================== UPDATE NAVBAR LINK ====================
+  const navbarLink = document.getElementById("navbar-auth-link");
+  if (navbarLink) {
+    if (tab === "login") {
+      // If on Login tab, show "Register" link
+      navbarLink.innerHTML = `
+        <a href="#" onclick="switchTab('register'); return false;">Register</a>
+      `;
+    } else {
+      // If on Register tab, show "Login" link
+      navbarLink.innerHTML = `
+        <a href="#" onclick="switchTab('login'); return false;">Login</a>
+      `;
+    }
+  }
+  // ============================================================
+
   // Update URL hash
   window.location.hash = tab;
 }

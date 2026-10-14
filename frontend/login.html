@@ -17,7 +17,16 @@
         <li>
           <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
         </li>
-        <li><a href="login.html" class="active">Login</a></li>
+        <li id="navbar-auth-link">
+          <a
+            href="#"
+            onclick="
+              switchTab('register');
+              return false;
+            "
+            >Register</a
+          >
+        </li>
       </ul>
     </nav>
 
@@ -84,8 +93,9 @@
                 switchTab('register');
                 return false;
               "
-              >Register here</a
             >
+              Register here
+            </a>
           </p>
         </div>
 
@@ -96,9 +106,9 @@
 
           <form id="register-form">
             <div class="form-group">
-              <label for="reg-fullname"
-                >Full Name <span class="required">*</span></label
-              >
+              <label for="reg-fullname">
+                Full Name <span class="required">*</span>
+              </label>
               <input
                 type="text"
                 id="reg-fullname"
@@ -109,9 +119,9 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="reg-email"
-                  >Email <span class="required">*</span></label
-                >
+                <label for="reg-email">
+                  Email <span class="required">*</span>
+                </label>
                 <input
                   type="email"
                   id="reg-email"
@@ -121,9 +131,9 @@
               </div>
 
               <div class="form-group">
-                <label for="reg-username"
-                  >Username <span class="required">*</span></label
-                >
+                <label for="reg-username">
+                  Username <span class="required">*</span>
+                </label>
                 <input
                   type="text"
                   id="reg-username"
@@ -135,9 +145,9 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label for="reg-password"
-                  >Password <span class="required">*</span></label
-                >
+                <label for="reg-password">
+                  Password <span class="required">*</span>
+                </label>
                 <input
                   type="password"
                   id="reg-password"
@@ -174,8 +184,9 @@
                 switchTab('login');
                 return false;
               "
-              >Login here</a
             >
+              Login here
+            </a>
           </p>
         </div>
       </div>
