@@ -38,6 +38,28 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // ==================== OTP FIELDS ====================
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otpCode: {
+      type: String,
+      default: null,
+    },
+    otpExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    // ==================== FORGOT PASSWORD FIELDS ====================
+    resetOtpCode: {
+      type: String,
+      default: null,
+    },
+    resetOtpExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );

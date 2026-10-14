@@ -161,16 +161,17 @@ async function handleRegister(e) {
     return;
   }
 
-  showAlert("Account created! Switching to login...", "success");
+  showAlert("Account created! Please verify OTP. Redirecting...", "success");
 
   // Clear register form
   e.target.reset();
 
-  // Switch to login tab after 1.5 seconds
+  // Save email for OTP verification
+  sessionStorage.setItem("registerEmail", email);
+
+  // Redirect to OTP verification
   setTimeout(() => {
-    switchTab("login");
-    // Pre-fill email
-    document.getElementById("login-email").value = email;
+    window.location.href = "verify-otp.html?type=register";
   }, 1500);
 }
 
