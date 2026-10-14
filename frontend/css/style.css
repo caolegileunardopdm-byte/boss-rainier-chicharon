@@ -504,3 +504,18 @@ a:focus-visible {
   outline: 3px solid var(--primary-light);
   outline-offset: 2px;
 }
+/* ==================== NAVBAR LOGO ==================== */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px;
+}
