@@ -20,6 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   fillCustomerInfo(user);
   renderOrderSummary();
   setDefaultPickupDate();
+
+  // Initialize payment fields visibility
+  handlePaymentChange();
 });
 
 // ==================== UPDATE CART COUNT ====================
@@ -90,6 +93,36 @@ function renderOrderSummary() {
     formatPrice(getCartTotal());
 }
 
+// ==================== HANDLE PAYMENT METHOD CHANGE ====================
+function handlePaymentChange() {
+  const method = document.getElementById("payment-method");
+  if (!method) return;
+
+  const selectedMethod = method.value;
+
+  // Hide all payment fields first
+  const cashInfo = document.getElementById("cash-info");
+  const gcashFields = document.getElementById("gcash-fields");
+  const mayaFields = document.getElementById("maya-fields");
+  const bankFields = document.getElementById("bank-fields");
+
+  if (cashInfo) cashInfo.style.display = "none";
+  if (gcashFields) gcashFields.style.display = "none";
+  if (mayaFields) mayaFields.style.display = "none";
+  if (bankFields) bankFields.style.display = "none";
+
+  // Show the selected payment method's fields
+  if (selectedMethod === "cash" && cashInfo) {
+    cashInfo.style.display = "block";
+  } else if (selectedMethod === "gcash" && gcashFields) {
+    gcashFields.style.display = "block";
+  } else if (selectedMethod === "maya" && mayaFields) {
+    mayaFields.style.display = "block";
+  } else if (selectedMethod === "bank_transfer" && bankFields) {
+    bankFields.style.display = "block";
+  }
+}
+
 // ==================== PLACE ORDER ====================
 async function placeOrder() {
   const user = getCurrentUser();
@@ -108,10 +141,44 @@ async function placeOrder() {
   const pickupTime = document.getElementById("pickup-time").value;
   const paymentMethod = document.getElementById("payment-method").value;
 
-  // Validate
+  // Validate pick-up details
   if (!pickupDate || !pickupTime) {
     showAlert("Please select pick-up date and time.", "danger");
     return;
+  }
+
+  // ==================== VALIDATE PAYMENT DETAILS ====================
+  let paymentDetails = {};
+  let transactionRef = "";
+
+  if (paymentMethod === "gcash") {
+    const gcashNumber = document.getElementById("gcash-number").value.trim();
+    const gcashRef = document.getElementById("gcash-reference").value.trim();
+    if (!gcashNumber || !gcashRef) {
+      showAlert("Please fill in GCash number and reference number.", "danger");
+      return;
+    }
+    paymentDetails = { gcash_number: gcashNumber };
+    transactionRef = gcashRef;
+  } else if (paymentMethod === "maya") {
+    const mayaNumber = document.getElementById("maya-number").value.trim();
+    const mayaRef = document.getElementById("maya-reference").value.trim();
+    if (!mayaNumber || !mayaRef) {
+      showAlert("Please fill in Maya number and reference number.", "danger");
+      return;
+    }
+    paymentDetails = { maya_number: mayaNumber };
+    transactionRef = mayaRef;
+  } else if (paymentMethod === "bank_transfer") {
+    const bankName = document.getElementById("bank-name").value;
+    const bankAccount = document.getElementById("bank-account").value.trim();
+    const bankRef = document.getElementById("bank-reference").value.trim();
+    if (!bankName || !bankAccount || !bankRef) {
+      showAlert("Please fill in bank details and reference number.", "danger");
+      return;
+    }
+    paymentDetails = { bank_name: bankName, bank_account: bankAccount };
+    transactionRef = bankRef;
   }
 
   const btn = document.getElementById("place-order-btn");
@@ -149,9 +216,16 @@ async function placeOrder() {
       order_id: orderResult.data._id,
       payment_method: paymentMethod,
       amount: orderResult.data.total_amount,
-      status: "pending",
+      status: paymentMethod === "cash" ? "pending" : "paid",
+      transaction_ref: transactionRef,
+      payment_details: paymentDetails,
     }),
   });
+
+  if (!paymentResult.success) {
+    console.error("Payment failed:", paymentResult.error);
+    // Order was placed, but payment failed — still proceed
+  }
 
   // 3. Clear cart
   saveCart([]);
@@ -177,6 +251,7 @@ function showAlert(message, type) {
     alertEl.classList.remove("show");
   }, 5000);
 }
+
 // ==================== ORDERS PAGE LOGIC ====================
 let allOrders = [];
 let currentFilter = "all";

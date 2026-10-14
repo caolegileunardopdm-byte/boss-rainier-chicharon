@@ -201,23 +201,127 @@
           <h2>💳 Payment Method</h2>
           <div class="form-group">
             <label for="payment-method">Select Payment Method *</label>
-            <select id="payment-method" required>
+            <select
+              id="payment-method"
+              required
+              onchange="handlePaymentChange()"
+            >
               <option value="cash">Cash on Pick-up</option>
               <option value="gcash">GCash</option>
               <option value="maya">Maya</option>
               <option value="bank_transfer">Bank Transfer</option>
             </select>
           </div>
-          <p
+
+          <!-- CASH MESSAGE -->
+          <div
+            id="cash-info"
             style="
-              color: var(--text-light);
-              font-size: 0.9rem;
-              margin-top: 0.5rem;
+              background: #fef3c7;
+              padding: 1rem;
+              border-radius: 8px;
+              margin-top: 1rem;
             "
           >
-            💡 Payment will be processed upon pick-up or via the selected
-            method.
-          </p>
+            <p style="color: #92400e; font-size: 0.9rem; margin: 0">
+              💵 <strong>Cash on Pick-up:</strong> Bayaran ang order sa store
+              upon pick-up. Walang online payment na kailangan.
+            </p>
+          </div>
+
+          <!-- GCASH FIELDS -->
+          <div id="gcash-fields" style="display: none; margin-top: 1rem">
+            <div class="form-group">
+              <label for="gcash-number">GCash Number *</label>
+              <input type="text" id="gcash-number" placeholder="09171234567" />
+            </div>
+            <div class="form-group">
+              <label for="gcash-reference">GCash Reference Number *</label>
+              <input
+                type="text"
+                id="gcash-reference"
+                placeholder="0000 0000 0000"
+              />
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                font-size: 0.85rem;
+                margin-top: -0.5rem;
+              "
+            >
+              💡 Send payment to: <strong>09171234567</strong> (Boss Rainier
+              Chicharon). Pagkatapos mag-send, ilagay ang reference number.
+            </p>
+          </div>
+
+          <!-- MAYA FIELDS -->
+          <div id="maya-fields" style="display: none; margin-top: 1rem">
+            <div class="form-group">
+              <label for="maya-number">Maya Number *</label>
+              <input type="text" id="maya-number" placeholder="09171234567" />
+            </div>
+            <div class="form-group">
+              <label for="maya-reference">Maya Reference Number *</label>
+              <input
+                type="text"
+                id="maya-reference"
+                placeholder="0000 0000 0000"
+              />
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                font-size: 0.85rem;
+                margin-top: -0.5rem;
+              "
+            >
+              💡 Send payment to: <strong>09171234567</strong> (Boss Rainier
+              Chicharon). Pagkatapos mag-send, ilagay ang reference number.
+            </p>
+          </div>
+
+          <!-- BANK TRANSFER FIELDS -->
+          <div id="bank-fields" style="display: none; margin-top: 1rem">
+            <div class="form-group">
+              <label for="bank-name">Bank Name *</label>
+              <select id="bank-name">
+                <option value="">Select bank</option>
+                <option value="BDO">BDO Unibank</option>
+                <option value="BPI">Bank of the Philippine Islands</option>
+                <option value="Metrobank">Metrobank</option>
+                <option value="Landbank">Landbank</option>
+                <option value="UnionBank">UnionBank</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bank-account">Account Number *</label>
+              <input
+                type="text"
+                id="bank-account"
+                placeholder="1234 5678 9012"
+              />
+            </div>
+            <div class="form-group">
+              <label for="bank-reference">Reference Number *</label>
+              <input
+                type="text"
+                id="bank-reference"
+                placeholder="Transaction reference"
+              />
+            </div>
+            <p
+              style="
+                color: var(--text-light);
+                font-size: 0.85rem;
+                margin-top: -0.5rem;
+              "
+            >
+              💡 Bank details: <strong>BDO - 1234 5678 9012</strong> (Boss
+              Rainier Chicharon). Pagkatapos mag-transfer, ilagay ang reference
+              number.
+            </p>
+          </div>
         </div>
       </div>
 
