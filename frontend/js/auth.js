@@ -1,5 +1,39 @@
+// ==================== TAB SWITCHING ====================
+function switchTab(tab) {
+  // Update tab buttons
+  const tabs = document.querySelectorAll(".auth-tab");
+  tabs.forEach((t) => {
+    t.classList.toggle("active", t.dataset.tab === tab);
+  });
+
+  // Update panels
+  const panels = document.querySelectorAll(".auth-panel");
+  panels.forEach((p) => {
+    p.classList.toggle("active", p.id === `${tab}-panel`);
+  });
+
+  // Clear alert
+  const alertEl = document.getElementById("alert");
+  if (alertEl) {
+    alertEl.classList.remove("show");
+    alertEl.textContent = "";
+  }
+
+  // Update URL hash
+  window.location.hash = tab;
+}
+
 // ==================== INITIALIZE ====================
 document.addEventListener("DOMContentLoaded", () => {
+  // Check if there's a hash in URL (#register or #login)
+  const hash = window.location.hash.replace("#", "");
+  if (hash === "register") {
+    switchTab("register");
+  } else {
+    switchTab("login");
+  }
+
+  // Attach form handlers
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
@@ -10,14 +44,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (registerForm) {
     registerForm.addEventListener("submit", handleRegister);
   }
+
+  // Update cart count
+  const cartCountEl = document.getElementById("cart-count");
+  if (cartCountEl) {
+    cartCountEl.textContent = getCartCount();
+  }
 });
 
 // ==================== HANDLE LOGIN ====================
 async function handleLogin(e) {
   e.preventDefault();
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
 
   if (!email || !password) {
     showAlert("Please fill in all fields", "danger");
@@ -62,12 +102,12 @@ async function handleLogin(e) {
 async function handleRegister(e) {
   e.preventDefault();
 
-  const full_name = document.getElementById("full_name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
-  const phone = document.getElementById("phone").value.trim();
-  const address = document.getElementById("address").value.trim();
+  const full_name = document.getElementById("reg-fullname").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
+  const username = document.getElementById("reg-username").value.trim();
+  const password = document.getElementById("reg-password").value;
+  const phone = document.getElementById("reg-phone").value.trim();
+  const address = document.getElementById("reg-address").value.trim();
 
   if (!full_name || !email || !username || !password) {
     showAlert("Please fill in all required fields", "danger");
@@ -97,17 +137,23 @@ async function handleRegister(e) {
   });
 
   submitBtn.disabled = false;
-  submitBtn.textContent = "Register";
+  submitBtn.textContent = "Create Account";
 
   if (!result.success) {
     showAlert(result.error || "Registration failed", "danger");
     return;
   }
 
-  showAlert("Account created! Redirecting to login...", "success");
+  showAlert("Account created! Switching to login...", "success");
 
+  // Clear register form
+  e.target.reset();
+
+  // Switch to login tab after 1.5 seconds
   setTimeout(() => {
-    window.location.href = "login.html";
+    switchTab("login");
+    // Pre-fill email
+    document.getElementById("login-email").value = email;
   }, 1500);
 }
 
@@ -121,5 +167,6 @@ function showAlert(message, type) {
 
   setTimeout(() => {
     alertEl.classList.remove("show");
+    alertEl.textContent = "";
   }, 5000);
 }

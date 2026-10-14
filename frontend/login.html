@@ -3,84 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Boss Rainier Chicharon</title>
+    <title>Login / Register - Boss Rainier Chicharon</title>
     <link rel="stylesheet" href="css/style.css" />
-    <style>
-      .auth-container {
-        max-width: 420px;
-        margin: 4rem auto;
-        padding: 2.5rem 2rem;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-      }
-      .auth-container h1 {
-        color: var(--primary);
-        text-align: center;
-        margin-bottom: 0.5rem;
-        font-size: 2rem;
-      }
-      .auth-container > p {
-        text-align: center;
-        color: var(--text-light);
-        margin-bottom: 2rem;
-      }
-      .form-group {
-        margin-bottom: 1.25rem;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-        color: var(--text-dark);
-        font-size: 0.95rem;
-      }
-      .form-group input {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 2px solid var(--gray-200);
-        border-radius: 8px;
-        font-size: 1rem;
-        transition:
-          border-color 0.2s,
-          box-shadow 0.2s;
-        background: white;
-        color: var(--text-dark);
-        font-family: inherit;
-        box-sizing: border-box;
-      }
-      .form-group input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
-      }
-      .auth-link {
-        text-align: center;
-        margin-top: 1.5rem;
-        color: var(--text-light);
-        font-size: 0.95rem;
-      }
-      .alert {
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        display: none;
-        font-size: 0.95rem;
-      }
-      .alert.show {
-        display: block;
-      }
-      .alert-success {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #6ee7b7;
-      }
-      .alert-danger {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fca5a5;
-      }
-    </style>
+    <link rel="stylesheet" href="css/auth.css" />
   </head>
   <body>
     <!-- NAVBAR -->
@@ -92,58 +17,177 @@
         <li>
           <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
         </li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="register.html">Register</a></li>
+        <li><a href="login.html" class="active">Login</a></li>
       </ul>
     </nav>
 
-    <!-- LOGIN FORM -->
-    <div class="auth-container">
-      <h1>Welcome Back!</h1>
-      <p>Login to your account</p>
-
-      <div id="alert" class="alert"></div>
-
-      <form id="login-form">
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="juan@example.com"
-            required
-          />
+    <!-- AUTH CONTAINER -->
+    <div class="auth-wrapper">
+      <div class="auth-container">
+        <!-- TABS -->
+        <div class="auth-tabs">
+          <button
+            class="auth-tab active"
+            data-tab="login"
+            onclick="switchTab('login')"
+          >
+            🔐 Login
+          </button>
+          <button
+            class="auth-tab"
+            data-tab="register"
+            onclick="switchTab('register')"
+          >
+            ✨ Register
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter your password"
-            required
-          />
+        <!-- ALERT -->
+        <div id="alert" class="alert"></div>
+
+        <!-- LOGIN PANEL -->
+        <div id="login-panel" class="auth-panel active">
+          <h1>Welcome Back!</h1>
+          <p class="auth-subtitle">Login to continue shopping</p>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input
+                type="email"
+                id="login-email"
+                placeholder="juan@example.com"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="login-password">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              Login
+            </button>
+          </form>
+
+          <p class="auth-footer">
+            Don't have an account?
+            <a
+              href="#"
+              onclick="
+                switchTab('register');
+                return false;
+              "
+              >Register here</a
+            >
+          </p>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%">
-          Login
-        </button>
-      </form>
+        <!-- REGISTER PANEL -->
+        <div id="register-panel" class="auth-panel">
+          <h1>Create Account</h1>
+          <p class="auth-subtitle">Sign up to start ordering</p>
 
-      <p class="auth-link">
-        Don't have an account? <a href="register.html">Register here</a>
-      </p>
+          <form id="register-form">
+            <div class="form-group">
+              <label for="reg-fullname"
+                >Full Name <span class="required">*</span></label
+              >
+              <input
+                type="text"
+                id="reg-fullname"
+                placeholder="Juan Dela Cruz"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-email"
+                  >Email <span class="required">*</span></label
+                >
+                <input
+                  type="email"
+                  id="reg-email"
+                  placeholder="juan@example.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="reg-username"
+                  >Username <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="reg-username"
+                  placeholder="juandc"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="reg-password"
+                  >Password <span class="required">*</span></label
+                >
+                <input
+                  type="password"
+                  id="reg-password"
+                  placeholder="Min 6 characters"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="reg-phone">Phone</label>
+                <input type="text" id="reg-phone" placeholder="09171234567" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-address">Address</label>
+              <textarea
+                id="reg-address"
+                rows="2"
+                placeholder="Marilao, Bulacan"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              Create Account
+            </button>
+          </form>
+
+          <p class="auth-footer">
+            Already have an account?
+            <a
+              href="#"
+              onclick="
+                switchTab('login');
+                return false;
+              "
+              >Login here</a
+            >
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- FOOTER -->
     <footer class="footer">
       <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+      <p>Patubig, Marilao, Bulacan</p>
     </footer>
 
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
-    <script>
-      document.getElementById("cart-count").textContent = getCartCount();
-    </script>
   </body>
 </html>
