@@ -55,7 +55,7 @@
         <span>Boss Rainier Chicharon</span>
       </a>
       <ul class="navbar-nav">
-        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html" class="active">Home</a></li>
         <li><a href="products.html">Products</a></li>
         <li>
           <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
@@ -66,47 +66,247 @@
       </ul>
     </nav>
 
-    <!-- HERO -->
-    <div class="container">
-      <div class="hero">
+    <!-- HERO SECTION WITH IMAGE -->
+    <section class="hero-section">
+      <div class="hero-content">
         <h1>Boss Rainier Chicharon</h1>
         <p>Signature chicharon ni Mrs. Marissa Del Rosario</p>
-        <a href="products.html" class="btn btn-primary">Shop Now</a>
+        <p class="hero-subtitle">Crispy • Crunchy • Masarap</p>
+        <div class="hero-buttons">
+          <a href="products.html" class="btn btn-primary">🛒 Shop Now</a>
+          <a href="#location" class="btn btn-secondary">📍 View Location</a>
+        </div>
       </div>
+      <div class="hero-image">
+        <!-- ============================================ -->
+        <!-- DITO MO ILALAGAY ANG HERO IMAGE              -->
+        <!-- I-replace ang "hero.jpg" ng pangalan ng image mo -->
+        <!-- ============================================ -->
+        <img
+          src="assets/images/hero.jpg"
+          alt="Boss Rainier Chicharon"
+          onerror="this.src = 'assets/preview.png'"
+        />
+      </div>
+    </section>
 
-      <!-- FEATURED PRODUCTS -->
-      <h2 style="margin: 2rem 0 1rem; color: var(--primary)">
-        Featured Products
-      </h2>
+    <!-- ABOUT SECTION -->
+    <section class="about-section">
+      <div class="about-image">
+        <!-- ============================================ -->
+        <!-- DITO MO ILALAGAY ANG ABOUT IMAGE             -->
+        <!-- I-replace ang "about.jpg" ng pangalan ng image mo -->
+        <!-- ============================================ -->
+        <img
+          src="assets/images/about.jpg"
+          alt="About Boss Rainier"
+          onerror="this.src = 'assets/preview.png'"
+        />
+      </div>
+      <div class="about-content">
+        <h2>Ang Aming Kwento</h2>
+        <p>
+          Ang <strong>Boss Rainier Chicharon</strong> ay isang lokal na negosyo
+          na matatagpuan sa Patubig, Marilao, Bulacan. Dalubhasa kami sa paggawa
+          ng <strong>signature chicharon</strong> na gawa sa fresh pork at
+          pinalasa ng seasonings at chili — recipe na likha ni
+          <strong>Mrs. Marissa Del Rosario</strong>.
+        </p>
+        <p>
+          Bukod sa chicharon, nagbebenta rin kami ng watermelon seeds at iba
+          pang take-home gifts para sa mga lokal na residente at passers-by.
+        </p>
+        <div class="about-stats">
+          <div class="stat-item">
+            <span class="stat-number">8AM - 7PM</span>
+            <span class="stat-label">Open Daily</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Fresh Pork</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">⭐⭐⭐⭐⭐</span>
+            <span class="stat-label">Masarap!</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY CHOOSE US -->
+    <div class="container">
+      <h2 class="section-title">✨ Why Choose Us?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🥓</div>
+          <h3>Signature Chicharon</h3>
+          <p>
+            Original recipe ni Mrs. Marissa Del Rosario — crispy, crunchy, at
+            masarap!
+          </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Pre-Order Online</h3>
+          <p>Order in advance and skip the line. Convenient para sa lahat!</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🕐</div>
+          <h3>Pick-up Scheduling</h3>
+          <p>Piliin ang date at time na kukunin mo ang order mo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💳</div>
+          <h3>Multiple Payments</h3>
+          <p>Cash, GCash, Maya, o Bank Transfer — ikaw ang pipili!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURED PRODUCTS -->
+    <div class="container">
+      <h2 class="section-title">📦 Featured Products</h2>
       <div id="featured-products" class="grid grid-3">
         <div class="loading">
           <div class="spinner"></div>
           <p>Loading products...</p>
         </div>
       </div>
+      <div style="text-align: center; margin-top: 2rem">
+        <a href="products.html" class="btn btn-primary">View All Products →</a>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="container">
+      <h2 class="section-title">📸 Gallery</h2>
+      <div class="gallery-grid">
+        <!-- ============================================ -->
+        <!-- DITO MO ILALAGAY ANG GALLERY IMAGES          -->
+        <!-- I-replace ang "gallery1.jpg", "gallery2.jpg", "gallery3.jpg" -->
+        <!-- ============================================ -->
+        <div class="gallery-item">
+          <img
+            src="assets/images/gallery1.jpg"
+            alt="Chicharon Gallery 1"
+            onerror="this.src = 'assets/preview.png'"
+          />
+        </div>
+        <div class="gallery-item">
+          <img
+            src="assets/images/gallery2.jpg"
+            alt="Chicharon Gallery 2"
+            onerror="this.src = 'assets/preview.png'"
+          />
+        </div>
+        <div class="gallery-item">
+          <img
+            src="assets/images/gallery3.jpg"
+            alt="Chicharon Gallery 3"
+            onerror="this.src = 'assets/preview.png'"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- OPERATING HOURS & CONTACT -->
+    <div class="container">
+      <h2 class="section-title">📞 Visit Us</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-icon">🕐</div>
+          <h3>Operating Hours</h3>
+          <p><strong>Monday - Sunday</strong></p>
+          <p>8:00 AM – 7:00 PM</p>
+          <p class="info-note">Bukas araw-araw!</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📞</div>
+          <h3>Contact Number</h3>
+          <p><strong>0935069928</strong></p>
+          <p class="info-note">Call or text for inquiries</p>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📍</div>
+          <h3>Location</h3>
+          <p><strong>Patubig, Marilao</strong></p>
+          <p>Bulacan, Philippines</p>
+          <p class="info-note">Near Rural Health Unit (RHU)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOCATION MAP -->
+    <div class="container" id="location">
+      <h2 class="section-title">📍 Find Us on the Map</h2>
+      <div class="map-container">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3858.5647!2d120.9601!3d14.7567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPatubig%2C%20Marilao%2C%20Bulacan!5e0!3m2!1sen!2sph!4v1234567890"
+          width="100%"
+          height="450"
+          style="border: 0; border-radius: 16px"
+          allowfullscreen=""
+          loading="lazy"
+        ></iframe>
+        <div class="map-note">
+          <p>
+            📌 <strong>Boss Rainier Chicharon</strong> — Patubig, Marilao,
+            Bulacan
+          </p>
+          <p>Landmark: Malapit sa Rural Health Unit (RHU) at Angel's Burger</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA SECTION -->
+    <div class="container">
+      <div class="cta-section">
+        <h2>Ready to Order?</h2>
+        <p>
+          Pre-order na ngayon at i-pick up sa araw na convenient para sa iyo!
+        </p>
+        <a href="products.html" class="btn btn-primary">Start Ordering →</a>
+      </div>
     </div>
 
     <!-- FOOTER -->
     <footer class="footer">
-      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
-      <p>Patubig, Marilao, Bulacan</p>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>🥓 Boss Rainier Chicharon</h3>
+          <p>Signature chicharon ni Mrs. Marissa Del Rosario</p>
+        </div>
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <a href="index.html">Home</a>
+          <a href="products.html">Products</a>
+          <a href="cart.html">Cart</a>
+          <a href="login.html">Login</a>
+        </div>
+        <div class="footer-section">
+          <h3>Contact</h3>
+          <p>📍 Patubig, Marilao, Bulacan</p>
+          <p>📞 0935069928</p>
+          <p>🕐 8:00 AM – 7:00 PM</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+      </div>
     </footer>
 
     <script src="js/config.js"></script>
     <script>
-      // Update cart count
       document.getElementById("cart-count").textContent = getCartCount();
 
-      // Check if logged in
       const user = getCurrentUser();
       if (user) {
         document.getElementById("auth-links").innerHTML = `
-        <span style="color: white;">Hi, ${user.full_name}!</span>
-        <a href="#" onclick="logout(); return false;">Logout</a>
-      `;
+          <span style="color: white;">Hi, ${user.full_name}!</span>
+          <a href="#" onclick="logout(); return false;">Logout</a>
+        `;
       }
 
-      // Load featured products
       async function loadProducts() {
         const result = await apiCall("/products");
         const container = document.getElementById("featured-products");
@@ -116,24 +316,24 @@
           return;
         }
 
-        const products = result.data.slice(0, 6);
+        const products = result.data.slice(0, 4);
         container.innerHTML = products
           .map(
             (product) => `
-        <div class="card">
-          <h3 class="card-title">${product.name}</h3>
-          <p class="card-description">${product.description || "No description"}</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-            <span class="card-price">${formatPrice(product.price)}</span>
-            <span class="badge ${product.stock_quantity > 0 ? "badge-success" : "badge-danger"}">
-              ${product.stock_quantity > 0 ? `Stock: ${product.stock_quantity}` : "Out of Stock"}
-            </span>
+          <div class="card">
+            <h3 class="card-title">${product.name}</h3>
+            <p class="card-description">${product.description || "No description"}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+              <span class="card-price">${formatPrice(product.price)}</span>
+              <span class="badge ${product.stock_quantity > 0 ? "badge-success" : "badge-danger"}">
+                ${product.stock_quantity > 0 ? `Stock: ${product.stock_quantity}` : "Out of Stock"}
+              </span>
+            </div>
+            <a href="products.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem; display: block;">
+              Order Now
+            </a>
           </div>
-          <a href="products.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem; display: block;">
-            View Products
-          </a>
-        </div>
-      `,
+        `,
           )
           .join("");
       }
