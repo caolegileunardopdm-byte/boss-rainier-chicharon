@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { sendOtpEmail } = require("../services/emailService");
 
 // ==================== REGISTER ====================
 exports.register = async (req, res) => {
@@ -40,12 +41,8 @@ exports.register = async (req, res) => {
       otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
     });
 
-    // Print OTP to console (for demo purposes)
-    console.log("\n🔐 ================================");
-    console.log(`📧 REGISTRATION OTP for ${email}`);
-    console.log(`🔑 OTP Code: ${otp}`);
-    console.log(`⏰ Expires in 10 minutes`);
-    console.log("🔐 ================================\n");
+    // Send OTP via email
+    await sendOtpEmail(email, otp, "registration");
 
     // Huwag i-return ang password
     const userResponse = {
@@ -205,12 +202,8 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
 
     // Print OTP to console (for demo purposes)
-    console.log("\n🔐 ================================");
-    console.log(`📧 PASSWORD RESET OTP for ${email}`);
-    console.log(`🔑 OTP Code: ${otp}`);
-    console.log(`⏰ Expires in 10 minutes`);
-    console.log("🔐 ================================\n");
-
+    // Send OTP via email
+    await sendOtpEmail(email, otp, "reset");
     res.json({
       success: true,
       message: "OTP sent to your email. Check your inbox.",
@@ -373,12 +366,8 @@ exports.resendOtp = async (req, res) => {
 
     await user.save();
 
-    console.log("\n🔐 ================================");
-    console.log(`📧 NEW OTP for ${email}`);
-    console.log(`🔑 OTP Code: ${otp}`);
-    console.log(`⏰ Expires in 10 minutes`);
-    console.log("🔐 ================================\n");
-
+    // Send new OTP via email
+    await sendOtpEmail(email, otp, type);
     res.json({
       success: true,
       message: "New OTP sent. Check your inbox.",

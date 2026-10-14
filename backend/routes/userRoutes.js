@@ -28,7 +28,6 @@ router.post("/verify-reset-otp", verifyResetOtp);
 router.post("/reset-password", resetPassword);
 
 // ==================== TEMPORARY: VERIFY ALL USERS ====================
-// ⚠️ PARA SA TESTING LANG — i-delete pagkatapos gamitin
 router.get("/verify-all-users", async (req, res) => {
   try {
     const User = require("../models/User");
@@ -41,9 +40,9 @@ router.get("/verify-all-users", async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-// ==================================================================
 
 // ==================== USER MANAGEMENT ROUTES ====================
+// ⚠️ DAPAT ITO ANG HULI — para hindi ma-catch ang ibang routes
 router.get("/", getUsers);
 router.get("/:id", getUser);
 router.put("/:id", updateUser);
