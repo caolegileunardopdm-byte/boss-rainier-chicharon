@@ -1,3 +1,4 @@
+require("dotenv").config();
 const nodemailer = require("nodemailer");
 
 // ==================== CONFIGURE TRANSPORTER ====================
@@ -8,13 +9,11 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
-
-// ==================== VERIFY CONNECTION ====================
-transporter.verify((error) => {
+transporter.verify((error, success) => {
   if (error) {
-    console.log("❌ Email service error:", error.message);
+    console.error("❌ Email service error:", error.message);
   } else {
-    console.log("✅ Email service ready to send OTPs");
+    console.log("✅ Email service is ready!");
   }
 });
 
