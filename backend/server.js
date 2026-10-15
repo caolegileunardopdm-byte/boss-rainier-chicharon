@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -46,37 +45,33 @@ app.use((req, res) => {
 // ==================== ERROR HANDLER ====================
 app.use((err, req, res, next) => {
   console.error("Server error:", err.message);
+
   res.status(500).json({
     success: false,
-    error: err.message || "Internal server error",
+    error: "Internal server error",
   });
 });
 
-// ==================== DATABASE CONNECTION ====================
+// ==================== DATABASE & SERVER ====================
 const MONGODB_URI = process.env.MONGODB_URI;
 const PORT = process.env.PORT || 5000;
 
 if (!MONGODB_URI) {
-  console.error("❌ MONGODB_URI is not defined in .env file");
+  console.error("MONGODB_URI is not defined");
   process.exit(1);
 }
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("✅ Connected to MongoDB Atlas");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📡 Test:       http://localhost:${PORT}/`);
-      console.log(`📂 Categories: http://localhost:${PORT}/api/categories`);
-      console.log(`🛒 Products:   http://localhost:${PORT}/api/products`);
-      console.log(`👤 Users:      http://localhost:${PORT}/api/users`);
-      console.log(`📦 Orders:     http://localhost:${PORT}/api/orders`);
-      console.log(`📊 Inventory:  http://localhost:${PORT}/api/inventory`);
-      console.log(`💳 Payments:   http://localhost:${PORT}/api/payments`);
+    console.log("Connected to MongoDB Atlas");
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server listening on port ${PORT}`);
+      console.log("Boss Rainier Chicharon API is ready");
     });
   })
   .catch((error) => {
-    console.error("❌ MongoDB connection error:", error.message);
+    console.error("MongoDB connection error:", error.message);
     process.exit(1);
   });
