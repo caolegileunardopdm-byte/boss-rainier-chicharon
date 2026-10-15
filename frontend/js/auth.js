@@ -107,7 +107,9 @@ async function handleLogin(e) {
   // Redirect based on role
   setTimeout(() => {
     const role = result.data.user.role;
-    if (role === "admin" || role === "staff") {
+    if (role === "staff") {
+      window.location.href = "admin/staff-pos.html";
+    } else if (role === "admin") {
       window.location.href = "admin/dashboard.html";
     } else {
       window.location.href = "products.html";

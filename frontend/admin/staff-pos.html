@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POS — Boss Rainier Chicharon</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/staff.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="../index.html" class="navbar-brand">
+        <img
+          src="../assets/logo.png"
+          alt="Boss Rainier Chicharon"
+          class="navbar-logo"
+        />
+        <span>Boss Rainier Chicharon</span>
+      </a>
+      <ul class="navbar-nav">
+        <li>
+          <span style="color: white; padding: 0.5rem 1rem"
+            >Cashier: <strong id="cashier-name">—</strong></span
+          >
+        </li>
+        <li>
+          <a
+            href="#"
+            onclick="
+              logout();
+              return false;
+            "
+            >Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MAIN LAYOUT -->
+    <div class="staff-layout">
+      <!-- SIDEBAR -->
+      <aside class="staff-sidebar">
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">Menu</h3>
+          <ul class="sidebar-menu">
+            <li>
+              <a
+                href="#"
+                class="sidebar-link active"
+                data-section="pos"
+                onclick="
+                  showSection('pos');
+                  return false;
+                "
+                >🛍️ POS</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-section="orders"
+                onclick="
+                  showSection('orders');
+                  return false;
+                "
+                >🛒 My Orders</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
+                data-section="products"
+                onclick="
+                  showSection('products');
+                  return false;
+                "
+                >📦 Products</a
+              >
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="staff-content">
+        <!-- ==================== POS SECTION ==================== -->
+        <section id="section-pos" class="staff-section active">
+          <div class="pos-layout">
+            <!-- POS LEFT: Products -->
+            <div class="pos-products">
+              <div class="pos-search">
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="🔍 Search product o i-scan ang barcode..."
+                  autofocus
+                />
+                <button class="btn-scan" onclick="openScanner()">
+                  📷 Scan
+                </button>
+              </div>
+
+              <h2 class="section-heading">Products</h2>
+              <div id="products-grid" class="products-grid">
+                <div class="loading-state">
+                  <div class="spinner"></div>
+                  <p>Loading products...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- POS RIGHT: Cart -->
+            <div class="pos-cart">
+              <h2 class="cart-heading">🛒 Cart</h2>
+              <div id="cart-items" class="cart-items">
+                <p class="empty-cart">Walang laman ang cart.</p>
+              </div>
+
+              <div class="cart-summary">
+                <div class="cart-row">
+                  <span>Subtotal</span>
+                  <span id="subtotal">₱0.00</span>
+                </div>
+                <div class="cart-row cart-total-row">
+                  <span>TOTAL</span>
+                  <span id="total">₱0.00</span>
+                </div>
+              </div>
+
+              <div class="cart-actions">
+                <button class="btn-clear" onclick="clearCart()">
+                  🗑️ Clear
+                </button>
+                <button class="btn-checkout" onclick="openCheckout()">
+                  💰 Checkout
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== ORDERS SECTION ==================== -->
+        <section id="section-orders" class="staff-section">
+          <h1 class="page-title">🛒 My Walk-in Transactions</h1>
+          <div class="orders-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="orders-body">
+                <tr>
+                  <td colspan="5" class="table-loading">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ==================== PRODUCTS SECTION ==================== -->
+        <section id="section-products" class="staff-section">
+          <h1 class="page-title">📦 Products (View Only)</h1>
+          <div class="products-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Barcode</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                </tr>
+              </thead>
+              <tbody id="products-list-body">
+                <tr>
+                  <td colspan="4" class="table-loading">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- SCANNER MODAL -->
+    <div id="scanner-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📷 Scan Barcode</h2>
+          <button class="modal-close" onclick="closeScanner()">✕</button>
+        </div>
+        <div id="scanner-reader"></div>
+        <p class="scanner-hint">Itutok ang camera sa barcode.</p>
+      </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>💰 Checkout</h2>
+          <button class="modal-close" onclick="closeCheckout()">✕</button>
+        </div>
+
+        <div class="checkout-summary">
+          <div class="checkout-row">
+            <span>Total</span>
+            <span id="checkout-total" class="checkout-total">₱0.00</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select id="payment-method">
+            <option value="cash">Cash</option>
+            <option value="gcash">GCash</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Amount Received (₱)</label>
+          <input
+            type="number"
+            id="amount-received"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          />
+        </div>
+
+        <div class="change-display">
+          <span>Change:</span>
+          <strong id="change-amount">₱0.00</strong>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-secondary" onclick="closeCheckout()">
+            Cancel
+          </button>
+          <button class="btn-primary" onclick="confirmCheckout()">
+            Confirm & Print
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin/staff-pos.js"></script>
+  </body>
+</html>
