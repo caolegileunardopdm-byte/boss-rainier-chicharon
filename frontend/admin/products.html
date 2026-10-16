@@ -219,7 +219,6 @@
         </li>
       </ul>
     </nav>
-
     <!-- ADMIN PRODUCTS -->
     <div class="admin-container">
       <div class="admin-header">
@@ -259,75 +258,18 @@
       </div>
     </div>
 
-    <!-- ADD/EDIT MODAL -->
+    <!-- ==================== ADD/EDIT MODAL ==================== -->
     <div id="product-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="modal-title">Add Product</h2>
           <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
-        <!-- ==================== QR SCANNER MODAL ==================== -->
-        <div id="scanner-modal" class="modal">
-          <div class="modal-content modal-scanner">
-            <div class="modal-header">
-              <h2>📷 Scan Product QR/Barcode</h2>
-              <button class="modal-close" onclick="closeQRScanner()">✕</button>
-            </div>
-            <div id="qr-reader"></div>
-            <p
-              style="
-                text-align: center;
-                color: var(--text-light);
-                font-size: 0.85rem;
-                margin-top: 0.75rem;
-              "
-            >
-              Itutok ang camera sa QR code o barcode ng product.
-            </p>
-            <div
-              id="scan-status"
-              style="text-align: center; margin-top: 1rem"
-            ></div>
-          </div>
-        </div>
-
-        <!-- ==================== PRODUCT INFO MODAL (Result) ==================== -->
-        <div id="product-info-modal" class="modal">
-          <div class="modal-content modal-info">
-            <div class="modal-header">
-              <h2>✅ Product Found</h2>
-              <button class="modal-close" onclick="closeProductInfo()">
-                ✕
-              </button>
-            </div>
-
-            <div id="product-info-content">
-              <!-- Lalabas dito ang product info -->
-            </div>
-
-            <div class="modal-actions" style="margin-top: 1.5rem">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                onclick="closeProductInfo()"
-                style="flex: 1"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                onclick="scanAnother()"
-                style="flex: 1"
-              >
-                📷 Scan Another
-              </button>
-            </div>
-          </div>
-        </div>
 
         <form id="product-form" onsubmit="saveProduct(event)">
           <input type="hidden" id="product-id" />
+
+          <!-- IMAGE UPLOAD -->
           <div class="form-group">
             <label>Product Image</label>
             <div class="image-upload-wrapper">
@@ -417,6 +359,64 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- ==================== QR SCANNER MODAL ==================== -->
+    <div id="scanner-modal" class="modal">
+      <div class="modal-content modal-scanner">
+        <div class="modal-header">
+          <h2>📷 Scan Product QR/Barcode</h2>
+          <button class="modal-close" onclick="closeQRScanner()">✕</button>
+        </div>
+        <div id="qr-reader"></div>
+        <p
+          style="
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+          "
+        >
+          Itutok ang camera sa QR code o barcode ng product.
+        </p>
+        <div
+          id="scan-status"
+          style="text-align: center; margin-top: 1rem"
+        ></div>
+      </div>
+    </div>
+
+    <!-- ==================== PRODUCT INFO MODAL ==================== -->
+    <div id="product-info-modal" class="modal">
+      <div class="modal-content modal-info">
+        <div class="modal-header">
+          <h2>✅ Product Found</h2>
+          <button class="modal-close" onclick="closeProductInfo()">✕</button>
+        </div>
+
+        <div id="product-info-content">
+          <!-- Lalabas dito ang product info -->
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeProductInfo()"
+            style="flex: 1"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="scanAnother()"
+            style="flex: 1"
+          >
+            📷 Scan Another
+          </button>
+        </div>
       </div>
     </div>
 
