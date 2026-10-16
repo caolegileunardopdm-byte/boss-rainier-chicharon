@@ -47,11 +47,7 @@
     <!-- NAVBAR -->
     <nav class="navbar">
       <a href="index.html" class="navbar-brand">
-        <img
-          src="assets/logo.png"
-          alt="Crispy Chicharon"
-          class="navbar-logo"
-        />
+        <img src="assets/logo.png" alt="Crispy Chicharon" class="navbar-logo" />
         <span>Crispy Chicharon</span>
       </a>
       <ul class="navbar-nav">
@@ -102,10 +98,10 @@
         <div class="card-content">
           <h2>📖 Ang Aming Kwento</h2>
           <p>
-            Ang <strong>Crispy Chicharon</strong> ay isang lokal na
-            negosyo na matatagpuan sa Patubig, Marilao, Bulacan. Dalubhasa kami
-            sa paggawa ng <strong>signature chicharon</strong> na gawa sa fresh
-            pork at pinalasa ng seasonings at chili — recipe na likha ni
+            Ang <strong>Crispy Chicharon</strong> ay isang lokal na negosyo na
+            matatagpuan sa Patubig, Marilao, Bulacan. Dalubhasa kami sa paggawa
+            ng <strong>signature chicharon</strong> na gawa sa fresh pork at
+            pinalasa ng seasonings at chili — recipe na likha ni
             <strong>Mrs. Marissa Del Rosario</strong>.
           </p>
           <div class="about-stats">
@@ -233,8 +229,7 @@
           ></iframe>
         </div>
         <p class="map-note">
-          📌 <strong>Crispy Chicharon</strong> — Patubig, Marilao,
-          Bulacan<br />
+          📌 <strong>Crispy Chicharon</strong> — Patubig, Marilao, Bulacan<br />
           Landmark: Malapit sa Rural Health Unit (RHU) at Angel's Burger
         </p>
       </section>
@@ -297,12 +292,23 @@
           container.innerHTML = '<p class="loading">No products available.</p>';
           return;
         }
-
         const products = result.data.slice(0, 4);
         container.innerHTML = products
           .map(
             (product) => `
           <div class="card">
+            ${
+              product.image_url
+                ? `<div class="product-image-wrapper">
+                    <img 
+                      src="${product.image_url}" 
+                      alt="${product.name}" 
+                      class="product-image" 
+                      onerror="this.style.display='none'" 
+                    />
+                  </div>`
+                : ""
+            }
             <h3 class="card-title">${product.name}</h3>
             <p class="card-description">${product.description || "No description"}</p>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
