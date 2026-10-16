@@ -190,3 +190,16 @@ function showAlert(message, type) {
     alertEl.textContent = "";
   }, 5000);
 }
+// ==================== PASSWORD VISIBILITY TOGGLE ====================
+function togglePassword(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+
+  if (input.type === "password") {
+    input.type = "text";
+    btn.textContent = "🙈"; // Monkey covering eyes = visible
+  } else {
+    input.type = "password";
+    btn.textContent = "👁"; // Eye = hidden
+  }
+}

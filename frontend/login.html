@@ -79,12 +79,22 @@
 
             <div class="form-group">
               <label for="login-password">Password</label>
-              <input
-                type="password"
-                id="login-password"
-                placeholder="Enter your password"
-                required
-              />
+              <div class="password-wrapper">
+                <input
+                  type="password"
+                  id="login-password"
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="toggle-password"
+                  onclick="togglePassword('login-password', this)"
+                  aria-label="Toggle password visibility"
+                >
+                  👁
+                </button>
+              </div>
             </div>
 
             <!-- FORGOT PASSWORD LINK -->
@@ -158,15 +168,25 @@
               </div>
 
               <div class="form-group">
-                <label for="reg-username">
-                  Username <span class="required">*</span>
+                <label for="reg-password">
+                  Password <span class="required">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="reg-username"
-                  placeholder="juandc"
-                  required
-                />
+                <div class="password-wrapper">
+                  <input
+                    type="password"
+                    id="reg-password"
+                    placeholder="Min 6 characters"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="toggle-password"
+                    onclick="togglePassword('reg-password', this)"
+                    aria-label="Toggle password visibility"
+                  >
+                    👁
+                  </button>
+                </div>
               </div>
             </div>
 
