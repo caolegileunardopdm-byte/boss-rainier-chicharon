@@ -29,7 +29,7 @@ app.use("/api/payments", paymentRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Boss Rainier Chicharon API is running!",
+    message: "Crispy Chicharon API is running!",
     timestamp: new Date().toISOString(),
   });
 });
@@ -68,7 +68,7 @@ mongoose
 
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server listening on port ${PORT}`);
-      console.log("Boss Rainier Chicharon API is ready");
+      console.log("Crispy Chicharon API is ready");
     });
   })
   .catch((error) => {

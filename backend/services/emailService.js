@@ -17,8 +17,8 @@ if (process.env.BREVO_API_KEY) {
 async function sendOtpEmail(to, otp, type = "registration") {
   const subject =
     type === "registration"
-      ? "🔐 Verify Your Account - Boss Rainier Chicharon"
-      : "🔐 Password Reset - Boss Rainier Chicharon";
+      ? "🔐 Verify Your Account - Crispy Chicharon"
+      : "🔐 Password Reset - Crispy Chicharon";
 
   const heading =
     type === "registration" ? "Verify Your Account" : "Reset Your Password";
@@ -31,7 +31,7 @@ async function sendOtpEmail(to, otp, type = "registration") {
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background: linear-gradient(135deg, #92400e 0%, #d97706 100%); padding: 30px; text-align: center; border-radius: 16px 16px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">🥓 Boss Rainier Chicharon</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">🥓 Crispy Chicharon</h1>
         <p style="color: white; margin: 5px 0 0 0; font-size: 14px;">Signature chicharon ni Mrs. Marissa Del Rosario</p>
       </div>
       <div style="background: white; padding: 30px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -47,7 +47,7 @@ async function sendOtpEmail(to, otp, type = "registration") {
         <p style="color: #6b7280; font-size: 12px; text-align: center; margin: 0;">
           📍 Patubig, Marilao, Bulacan<br />
           📞 0935069928<br />
-          © 2026 Boss Rainier Chicharon. All rights reserved.
+          © 2026 Crispy Chicharon. All rights reserved.
         </p>
       </div>
     </div>
@@ -56,7 +56,7 @@ async function sendOtpEmail(to, otp, type = "registration") {
   try {
     const response = await brevo.transactionalEmails.sendTransacEmail({
       sender: {
-        name: "Boss Rainier Chicharon",
+        name: "Crispy Chicharon",
         email: process.env.BREVO_SENDER_EMAIL,
       },
       to: [{ email: to }],

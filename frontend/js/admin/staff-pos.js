@@ -461,7 +461,7 @@ function printReceipt(order) {
 </head>
 <body>
   <div class="center">
-    <h1>BOSS RAINIER CHICHARON</h1>
+    <h1>Crispy Chicharon</h1>
     <div class="subtitle">Signature Chicharon</div>
     <div class="subtitle">ni Mrs. Marissa Del Rosario</div>
     <div class="subtitle">Patubig, Marilao, Bulacan</div>
