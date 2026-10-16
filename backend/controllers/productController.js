@@ -67,3 +67,42 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// ==================== GET PRODUCT BY BARCODE ====================
+// Para sa QR/Barcode scanner
+exports.getProductByBarcode = async (req, res) => {
+  try {
+    const code = req.params.code;
+
+    // Hanapin ang product sa barcode
+    const product = await Product.findOne({ barcode: code }).populate(
+      "category_id",
+      "name description",
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        error: "Product not found for barcode: " + code,
+      });
+    }
+
+    // Hanapin ang last order ng product
+    const OrderItem = require("../models/OrderItem");
+
+    const lastOrderItem = await OrderItem.findOne({ product_id: product._id })
+      .sort({ createdAt: -1 })
+      .populate("order_id", "order_date status pickup_date pickup_time");
+
+    const lastOrdered = lastOrderItem?.order_id?.order_date || null;
+
+    res.json({
+      success: true,
+      data: {
+        ...product.toObject(),
+        last_ordered: lastOrdered,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

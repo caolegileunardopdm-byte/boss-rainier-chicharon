@@ -224,9 +224,14 @@
     <div class="admin-container">
       <div class="admin-header">
         <h1>📦 Manage Products</h1>
-        <button class="btn btn-primary" onclick="openAddModal()">
-          + Add Product
-        </button>
+        <div style="display: flex; gap: 0.75rem">
+          <button class="btn btn-scan-qr" onclick="openQRScanner()">
+            📷 Scan QR
+          </button>
+          <button class="btn btn-primary" onclick="openAddModal()">
+            + Add Product
+          </button>
+        </div>
       </div>
 
       <div id="alert" class="alert"></div>
@@ -260,6 +265,65 @@
         <div class="modal-header">
           <h2 id="modal-title">Add Product</h2>
           <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <!-- ==================== QR SCANNER MODAL ==================== -->
+        <div id="scanner-modal" class="modal">
+          <div class="modal-content modal-scanner">
+            <div class="modal-header">
+              <h2>📷 Scan Product QR/Barcode</h2>
+              <button class="modal-close" onclick="closeQRScanner()">✕</button>
+            </div>
+            <div id="qr-reader"></div>
+            <p
+              style="
+                text-align: center;
+                color: var(--text-light);
+                font-size: 0.85rem;
+                margin-top: 0.75rem;
+              "
+            >
+              Itutok ang camera sa QR code o barcode ng product.
+            </p>
+            <div
+              id="scan-status"
+              style="text-align: center; margin-top: 1rem"
+            ></div>
+          </div>
+        </div>
+
+        <!-- ==================== PRODUCT INFO MODAL (Result) ==================== -->
+        <div id="product-info-modal" class="modal">
+          <div class="modal-content modal-info">
+            <div class="modal-header">
+              <h2>✅ Product Found</h2>
+              <button class="modal-close" onclick="closeProductInfo()">
+                ✕
+              </button>
+            </div>
+
+            <div id="product-info-content">
+              <!-- Lalabas dito ang product info -->
+            </div>
+
+            <div class="modal-actions" style="margin-top: 1.5rem">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="closeProductInfo()"
+                style="flex: 1"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="scanAnother()"
+                style="flex: 1"
+              >
+                📷 Scan Another
+              </button>
+            </div>
+          </div>
         </div>
 
         <form id="product-form" onsubmit="saveProduct(event)">
@@ -361,6 +425,7 @@
       <p>© 2026 Crispy Chicharon. All rights reserved.</p>
     </footer>
 
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="../js/config.js"></script>
     <script src="../js/admin/admin-auth.js"></script>
     <script src="../js/admin/admin-products.js"></script>

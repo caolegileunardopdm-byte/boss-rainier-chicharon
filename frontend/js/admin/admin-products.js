@@ -287,3 +287,193 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+// ============================================================
+// QR SCANNER
+// ============================================================
+let qrScannerInstance = null;
+
+function openQRScanner() {
+  const modal = document.getElementById("scanner-modal");
+  modal.classList.add("show");
+
+  document.getElementById("scan-status").innerHTML =
+    '<p style="color: #1e40af;">⏳ Nag-i-init ng camera...</p>';
+
+  qrScannerInstance = new Html5Qrcode("qr-reader");
+
+  qrScannerInstance
+    .start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      (decodedText) => {
+        // ✅ Successfully scanned
+        handleQRScan(decodedText);
+        closeQRScanner();
+      },
+      () => {
+        // Ignore per-frame errors
+      },
+    )
+    .catch((err) => {
+      console.error("Camera error:", err);
+      document.getElementById("scan-status").innerHTML =
+        '<p style="color: #dc2626;">❌ Hindi ma-access ang camera. Check permission.</p>';
+    });
+}
+
+function closeQRScanner() {
+  if (qrScannerInstance && qrScannerInstance.isScanning) {
+    qrScannerInstance
+      .stop()
+      .then(() => {
+        qrScannerInstance.clear();
+        qrScannerInstance = null;
+      })
+      .catch(() => {
+        qrScannerInstance = null;
+      });
+  }
+  document.getElementById("scanner-modal").classList.remove("show");
+}
+
+async function handleQRScan(barcode) {
+  // Show loading
+  document.getElementById("scan-status").innerHTML =
+    '<p style="color: #1e40af;">🔍 Hinahanap ang product...</p>';
+
+  // Fetch product sa barcode
+  const result = await apiCall(`/products/barcode/${barcode}`);
+
+  if (!result.success) {
+    alert(`❌ Walang product na naka-register sa barcode: ${barcode}`);
+    return;
+  }
+
+  // Display product info
+  displayProductInfo(result.data);
+}
+
+function displayProductInfo(product) {
+  const content = document.getElementById("product-info-content");
+
+  // Compute expiration status
+  let expirationHtml = "";
+  if (product.expiration_date) {
+    const expDate = new Date(product.expiration_date);
+    const now = new Date();
+    const daysLeft = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+
+    let statusClass = "expiration-ok";
+    let statusText = `✅ ${daysLeft} days remaining`;
+
+    if (daysLeft < 0) {
+      statusClass = "expiration-danger";
+      statusText = `❌ Expired ${Math.abs(daysLeft)} days ago`;
+    } else if (daysLeft <= 7) {
+      statusClass = "expiration-danger";
+      statusText = `⚠️ Expires in ${daysLeft} days — URGENT!`;
+    } else if (daysLeft <= 30) {
+      statusClass = "expiration-warning";
+      statusText = `⚠️ Expires in ${daysLeft} days`;
+    }
+
+    expirationHtml = `
+      <div class="scanned-section">
+        <h4>📅 Expiration Date</h4>
+        <div class="info-row">
+          <span>Expires on:</span>
+          <strong>${expDate.toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}</strong>
+        </div>
+        <div class="expiration-warning ${statusClass}">
+          ${statusText}
+        </div>
+      </div>
+    `;
+  } else {
+    expirationHtml = `
+      <div class="scanned-section">
+        <h4>📅 Expiration Date</h4>
+        <p style="color: var(--text-light); font-size: 0.85rem; text-align: center;">
+          Walang expiration date na naka-set.
+        </p>
+      </div>
+    `;
+  }
+
+  // Compute last ordered
+  let lastOrderedHtml = "";
+  if (product.last_ordered) {
+    const lastDate = new Date(product.last_ordered);
+    lastOrderedHtml = lastDate.toLocaleString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else {
+    lastOrderedHtml = "Walang record";
+  }
+
+  // Nutrition facts
+  const nf = product.nutrition_facts || {};
+
+  content.innerHTML = `
+    <div class="scanned-product">
+      <div class="scanned-header">
+        ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}" class="scanned-image" />` : ""}
+        <div class="scanned-header-info">
+          <h3>${product.name}</h3>
+          <p>📁 ${product.category_id?.name || "No category"}</p>
+          <p>🏷️ ${product.barcode}</p>
+          <p>💰 ₱${Number(product.price).toFixed(2)} | 📦 Stock: ${product.stock_quantity}</p>
+        </div>
+      </div>
+
+      <div class="scanned-section">
+        <h4>📊 Nutrition Facts</h4>
+        <div class="nutrition-grid">
+          <div class="nutrition-item">
+            <span>Calories:</span>
+            <strong>${nf.calories || 0} kcal</strong>
+          </div>
+          <div class="nutrition-item">
+            <span>Fat:</span>
+            <strong>${nf.fat || 0} g</strong>
+          </div>
+          <div class="nutrition-item">
+            <span>Sodium:</span>
+            <strong>${nf.sodium || 0} mg</strong>
+          </div>
+          <div class="nutrition-item">
+            <span>Protein:</span>
+            <strong>${nf.protein || 0} g</strong>
+          </div>
+        </div>
+      </div>
+
+      ${expirationHtml}
+
+      <div class="scanned-section">
+        <h4>🕐 Last Ordered</h4>
+        <div class="info-row">
+          <span>Date & Time:</span>
+          <strong>${lastOrderedHtml}</strong>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("product-info-modal").classList.add("show");
+}
+
+function closeProductInfo() {
+  document.getElementById("product-info-modal").classList.remove("show");
+}
+
+function scanAnother() {
+  closeProductInfo();
+  setTimeout(() => {
+    openQRScanner();
+  }, 300);
+}
