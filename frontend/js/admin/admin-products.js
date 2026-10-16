@@ -46,7 +46,10 @@ async function loadProducts() {
     .map(
       (p) => `
     <tr>
-      <td><strong>${p.name}</strong></td>
+      <td>
+        ${p.image_url ? `<img src="${p.image_url}" alt="${p.name}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-right:0.5rem; vertical-align:middle;" />` : ""}
+        <strong>${p.name}</strong>
+      </td>
       <td>${p.category_id?.name || '<em style="color: var(--text-light);">None</em>'}</td>
       <td><strong>${formatPrice(p.price)}</strong></td>
       <td>
@@ -73,6 +76,15 @@ function openAddModal() {
   document.getElementById("modal-title").textContent = "Add Product";
   document.getElementById("product-form").reset();
   document.getElementById("product-id").value = "";
+
+  // 🆕 Reset image
+  selectedImageFile = null;
+  uploadedImageUrl = "";
+  const previewContainer = document.getElementById("image-preview-container");
+  if (previewContainer) previewContainer.style.display = "none";
+  const previewImg = document.getElementById("image-preview");
+  if (previewImg) previewImg.src = "";
+
   document.getElementById("product-modal").classList.add("show");
 }
 
@@ -92,6 +104,21 @@ function openEditModal(id) {
   document.getElementById("product-barcode").value = product.barcode || "";
   document.getElementById("product-category").value =
     product.category_id?._id || "";
+
+  // 🆕 Display existing image kung meron
+  selectedImageFile = null;
+  uploadedImageUrl = product.image_url || "";
+  const previewContainer = document.getElementById("image-preview-container");
+  const previewImg = document.getElementById("image-preview");
+
+  if (product.image_url) {
+    previewImg.src = product.image_url;
+    previewContainer.style.display = "block";
+  } else {
+    previewContainer.style.display = "none";
+    previewImg.src = "";
+  }
+
   document.getElementById("product-modal").classList.add("show");
 }
 
@@ -105,6 +132,24 @@ function closeModal() {
 async function saveProduct(e) {
   e.preventDefault();
 
+  let imageUrl = uploadedImageUrl;
+  if (selectedImageFile) {
+    const saveBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Uploading image...";
+
+    imageUrl = await uploadImageToImageBB();
+
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+
+    if (!imageUrl) {
+      showAlert("Image upload failed. Product not saved.", "danger");
+      return;
+    }
+  }
+
   const productData = {
     name: document.getElementById("product-name").value.trim(),
     description: document.getElementById("product-description").value.trim(),
@@ -112,6 +157,7 @@ async function saveProduct(e) {
     stock_quantity: parseInt(document.getElementById("product-stock").value),
     barcode: document.getElementById("product-barcode").value.trim(),
     category_id: document.getElementById("product-category").value || null,
+    image_url: imageUrl, // 🆕 BAGO
   };
 
   let result;
@@ -167,4 +213,77 @@ function showAlert(message, type) {
   setTimeout(() => {
     alertEl.classList.remove("show");
   }, 3000);
+}
+// ============================================================
+// IMAGE UPLOAD (ImageBB)
+// ============================================================
+const IMAGEBB_API_KEY = "e919cc0a1548edb76da693636bd973ba";
+
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    selectedImageFile = null;
+    document.getElementById("image-preview-container").style.display = "none";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("Mali ang file type. Image lang ang pwede.");
+    event.target.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Masyadong malaki. Max 5MB.");
+    event.target.value = "";
+    return;
+  }
+
+  selectedImageFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById("image-preview").src = e.target.result;
+    document.getElementById("image-preview-container").style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  selectedImageFile = null;
+  uploadedImageUrl = "";
+  document.getElementById("product-image").value = "";
+  document.getElementById("image-preview-container").style.display = "none";
+  document.getElementById("image-preview").src = "";
+}
+
+async function uploadImageToImageBB() {
+  if (!selectedImageFile) return "";
+  try {
+    const base64 = await fileToBase64(selectedImageFile);
+    const formData = new FormData();
+    formData.append("key", IMAGEBB_API_KEY);
+    formData.append("image", base64);
+
+    const response = await fetch("https://api.imgbb.com/1/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const result = await response.json();
+    if (!result.success)
+      throw new Error(result.error?.message || "Upload failed");
+    return result.data.url;
+  } catch (error) {
+    console.error("Upload error:", error);
+    alert(`Image upload failed: ${error.message}`);
+    return "";
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }

@@ -76,9 +76,17 @@ function renderProducts() {
   grid.innerHTML = filteredProducts
     .map(
       (product) => `
-    <div class="card">
-      <h3 class="card-title">${product.name}</h3>
-      <p class="card-description">${product.description || "No description"}</p>
+  <div class="card">
+    ${
+      product.image_url
+        ? `<div class="product-image-wrapper">
+            <img src="${product.image_url}" alt="${product.name}" class="product-image" onerror="this.style.display='none'" />
+          </div>`
+        : ""
+    }
+    <h3 class="card-title">${product.name}</h3>
+    <p class="card-description">${product.description || "No description"}</p>
+    
 
       ${
         product.category_id
