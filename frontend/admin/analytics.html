@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Analytics - Admin</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/analytics.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="../index.html" class="navbar-brand">
+        <img
+          src="../assets/logo.png"
+          alt="Boss Rainier Chicharon"
+          class="navbar-logo"
+        />
+        <span>Boss Rainier Chicharon</span>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="orders.html">Orders</a></li>
+        <li><a href="inventory.html">Inventory</a></li>
+        <li><a href="users.html">Users</a></li>
+        <li><a href="payments.html">Payments</a></li>
+        <li><a href="analytics.html" class="active">Analytics</a></li>
+        <li>
+          <a
+            href="#"
+            onclick="
+              logout();
+              return false;
+            "
+            >Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="analytics-container">
+      <div class="analytics-header">
+        <div>
+          <h1>📊 Sales Analytics</h1>
+          <p class="subtitle">Monitor your store's performance</p>
+        </div>
+        <button class="btn-refresh" onclick="refreshData()">🔄 Refresh</button>
+      </div>
+
+      <!-- PERIOD TABS -->
+      <div class="period-tabs">
+        <button
+          class="period-tab"
+          data-period="daily"
+          onclick="setPeriod('daily')"
+        >
+          Daily
+        </button>
+        <button
+          class="period-tab active"
+          data-period="weekly"
+          onclick="setPeriod('weekly')"
+        >
+          Weekly
+        </button>
+        <button
+          class="period-tab"
+          data-period="monthly"
+          onclick="setPeriod('monthly')"
+        >
+          Monthly
+        </button>
+        <button
+          class="period-tab"
+          data-period="yearly"
+          onclick="setPeriod('yearly')"
+        >
+          Yearly
+        </button>
+      </div>
+
+      <!-- STATS CARDS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total">₱0.00</div>
+            <div class="stat-label">Total Sales</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-orders">0</div>
+            <div class="stat-label">Orders</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💵</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-average">₱0.00</div>
+            <div class="stat-label">Avg Order Value</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-today">₱0.00</div>
+            <div class="stat-label">Today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CHART -->
+      <div class="chart-card">
+        <h2 class="chart-title">📈 Sales Over Time</h2>
+        <div class="chart-wrapper">
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+
+      <!-- TWO COLUMN CHARTS -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h2 class="chart-title">🏆 Top Selling Products</h2>
+          <div class="chart-wrapper">
+            <canvas id="productsChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h2 class="chart-title">🥧 Sales by Category</h2>
+          <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Boss Rainier Chicharon. All rights reserved.</p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/admin/admin-auth.js"></script>
+    <script src="../js/admin/analytics.js"></script>
+  </body>
+</html>
