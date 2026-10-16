@@ -104,6 +104,18 @@ function openEditModal(id) {
   document.getElementById("product-barcode").value = product.barcode || "";
   document.getElementById("product-category").value =
     product.category_id?._id || "";
+  // 🆕 Display expiration date
+  const expDate = product.expiration_date
+    ? new Date(product.expiration_date).toISOString().split("T")[0]
+    : "";
+  document.getElementById("product-expiration").value = expDate;
+
+  // 🆕 Display nutrition facts
+  const nf = product.nutrition_facts || {};
+  document.getElementById("product-calories").value = nf.calories || 0;
+  document.getElementById("product-fat").value = nf.fat || 0;
+  document.getElementById("product-sodium").value = nf.sodium || 0;
+  document.getElementById("product-protein").value = nf.protein || 0;
 
   // 🆕 Display existing image kung meron
   selectedImageFile = null;
@@ -157,7 +169,18 @@ async function saveProduct(e) {
     stock_quantity: parseInt(document.getElementById("product-stock").value),
     barcode: document.getElementById("product-barcode").value.trim(),
     category_id: document.getElementById("product-category").value || null,
-    image_url: imageUrl, // 🆕 BAGO
+    image_url: imageUrl,
+    // 🆕 BAGO
+    expiration_date:
+      document.getElementById("product-expiration").value || null,
+    nutrition_facts: {
+      calories:
+        parseFloat(document.getElementById("product-calories").value) || 0,
+      fat: parseFloat(document.getElementById("product-fat").value) || 0,
+      sodium: parseFloat(document.getElementById("product-sodium").value) || 0,
+      protein:
+        parseFloat(document.getElementById("product-protein").value) || 0,
+    },
   };
 
   let result;
