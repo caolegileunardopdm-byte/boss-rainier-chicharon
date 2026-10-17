@@ -282,7 +282,7 @@ if (document.getElementById("orders-list")) {
 
 // ==================== LOAD ORDERS ====================
 async function loadOrders(user) {
-  const result = await apiCall("/orders/my-orders");
+  const result = await apiCall(`/orders/my-orders?userId=${user._id}`);
 
   if (!result.success || !result.data) {
     document.getElementById("orders-list").innerHTML = `

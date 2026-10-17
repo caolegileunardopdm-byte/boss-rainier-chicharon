@@ -52,7 +52,7 @@ exports.getOrder = async (req, res) => {
 exports.getMyOrders = async (req, res) => {
   try {
     // Kunin ang customer ID from JWT token
-    const customerId = req.user?.id || req.userId;
+    const customerId = req.query.userId || req.user?.id || req.userId;
 
     if (!customerId) {
       return res.status(401).json({
