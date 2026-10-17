@@ -463,6 +463,44 @@
         </div>
       </div>
     </div>
+    <!-- ==================== QR CODE MODAL ==================== -->
+    <div id="qr-modal" class="modal">
+      <div class="modal-content modal-qr">
+        <div class="modal-header">
+          <h2>📱 Product QR Code</h2>
+          <button class="modal-close" onclick="closeQRModal()">✕</button>
+        </div>
+
+        <div class="qr-content">
+          <div class="qr-image-wrapper">
+            <img id="qr-image" src="" alt="QR Code" />
+          </div>
+          <div class="qr-info">
+            <p><strong id="qr-product-name">—</strong></p>
+            <p>Barcode: <code id="qr-barcode">—</code></p>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 1.5rem">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeQRModal()"
+            style="flex: 1"
+          >
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="downloadQR()"
+            style="flex: 1"
+          >
+            📥 Download QR
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- FOOTER -->
     <footer class="footer">

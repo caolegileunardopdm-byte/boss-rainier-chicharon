@@ -58,9 +58,10 @@ async function loadProducts() {
         </span>
       </td>
       <td><code>${p.barcode || "—"}</code></td>
-      <td>
+            <td>
         <div class="action-btns">
           <button class="btn btn-sm btn-edit" onclick="openEditModal('${p._id}')">Edit</button>
+          <button class="btn btn-sm btn-qr" onclick="showProductQR('${p.barcode}', '${p.name.replace(/'/g, "\\'")}')">📥 QR</button>
           <button class="btn btn-sm btn-delete" onclick="deleteProduct('${p._id}', '${p.name.replace(/'/g, "\\'")}')">Delete</button>
         </div>
       </td>
@@ -499,4 +500,64 @@ function scanAnother() {
   setTimeout(() => {
     openQRScanner();
   }, 300);
+}
+// ============================================================
+// QR CODE GENERATION
+// ============================================================
+let currentQRBarcode = "";
+let currentQRName = "";
+
+function showProductQR(barcode, name) {
+  if (!barcode) {
+    alert(
+      "Walang barcode ang product na ito. I-edit muna at maglagay ng barcode.",
+    );
+    return;
+  }
+
+  currentQRBarcode = barcode;
+  currentQRName = name;
+
+  // Generate QR code using free API (api.qrserver.com)
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(barcode)}&margin=10`;
+
+  document.getElementById("qr-image").src = qrUrl;
+  document.getElementById("qr-product-name").textContent = name;
+  document.getElementById("qr-barcode").textContent = barcode;
+  document.getElementById("qr-modal").classList.add("show");
+}
+
+function closeQRModal() {
+  document.getElementById("qr-modal").classList.remove("show");
+  document.getElementById("qr-image").src = "";
+  currentQRBarcode = "";
+  currentQRName = "";
+}
+
+async function downloadQR() {
+  if (!currentQRBarcode) return;
+
+  try {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(currentQRBarcode)}&margin=10`;
+
+    // Fetch the image
+    const response = await fetch(qrUrl);
+    const blob = await response.blob();
+
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `QR-${currentQRBarcode}-${currentQRName.replace(/\s+/g, "-")}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Show success
+    alert(`✅ QR code downloaded: ${a.download}`);
+  } catch (error) {
+    console.error("Download error:", error);
+    alert("❌ Hindi ma-download ang QR code. Check internet connection.");
+  }
 }

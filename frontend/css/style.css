@@ -1878,3 +1878,61 @@ a:focus-visible {
   color: #065f46;
   border-left-color: #10b981;
 }
+/* ============================================================
+   QR CODE MODAL
+   ============================================================ */
+.btn-qr {
+  background: #10b981;
+  color: white;
+}
+
+.btn-qr:hover {
+  background: #059669;
+  color: white;
+}
+
+.modal-qr {
+  max-width: 400px;
+}
+
+.qr-content {
+  text-align: center;
+}
+
+.qr-image-wrapper {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid var(--gray-200);
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.qr-image-wrapper img {
+  width: 250px;
+  height: 250px;
+  display: block;
+}
+
+.qr-info {
+  margin-top: 1rem;
+}
+
+.qr-info p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.qr-info strong {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.qr-info code {
+  background: var(--gray-100);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
