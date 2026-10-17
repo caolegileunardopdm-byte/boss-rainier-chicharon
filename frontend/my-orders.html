@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Orders - Crispy Chicharon</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/my-orders.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <a href="index.html" class="navbar-brand">
+        <img src="assets/logo.png" alt="Crispy Chicharon" class="navbar-logo" />
+        <span>Crispy Chicharon</span>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="my-orders.html" class="active">My Orders</a></li>
+        <li>
+          <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+        </li>
+        <li id="auth-links">
+          <a href="login.html">Login</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="my-orders-container">
+      <h1 class="page-title">📦 My Orders</h1>
+      <p class="page-subtitle">Track your orders and view their status</p>
+
+      <!-- FILTER TABS -->
+      <div class="filter-tabs">
+        <button
+          class="filter-tab active"
+          data-status="all"
+          onclick="filterOrders('all')"
+        >
+          All
+        </button>
+        <button
+          class="filter-tab"
+          data-status="pending"
+          onclick="filterOrders('pending')"
+        >
+          Pending
+        </button>
+        <button
+          class="filter-tab"
+          data-status="confirmed"
+          onclick="filterOrders('confirmed')"
+        >
+          Confirmed
+        </button>
+        <button
+          class="filter-tab"
+          data-status="ready"
+          onclick="filterOrders('ready')"
+        >
+          Ready
+        </button>
+        <button
+          class="filter-tab"
+          data-status="completed"
+          onclick="filterOrders('completed')"
+        >
+          Completed
+        </button>
+        <button
+          class="filter-tab"
+          data-status="cancelled"
+          onclick="filterOrders('cancelled')"
+        >
+          Cancelled
+        </button>
+      </div>
+
+      <!-- ORDERS LIST -->
+      <div id="orders-list">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading your orders...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>© 2026 Crispy Chicharon. All rights reserved.</p>
+    </footer>
+
+    <!-- ==================== CUSTOM CONFIRM MODAL ==================== -->
+    <div id="confirm-modal" class="confirm-modal">
+      <div class="confirm-modal-content">
+        <div class="confirm-icon">⚠️</div>
+        <h2 id="confirm-title">Confirm Action</h2>
+        <p id="confirm-message">Are you sure you want to do this?</p>
+        <div class="confirm-actions">
+          <button class="btn btn-secondary" onclick="closeConfirmModal()">
+            No, Keep it
+          </button>
+          <button class="btn btn-danger" id="confirm-ok-btn">
+            Yes, Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/my-orders.js"></script>
+  </body>
+</html>

@@ -3,12 +3,14 @@ const router = express.Router();
 const {
   getOrders,
   getOrder,
+  getMyOrders,
   createOrder,
   updateOrderStatus,
   deleteOrder,
 } = require("../controllers/orderController");
 
 router.get("/", getOrders);
+router.get("/my-orders", getMyOrders);
 router.get("/:id", getOrder);
 router.post("/", createOrder);
 router.put("/:id/status", updateOrderStatus);

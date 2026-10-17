@@ -1,0 +1,313 @@
+/* ============================================================
+   MY ORDERS PAGE
+   ============================================================ */
+.my-orders-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page-title {
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+/* FILTER TABS */
+.filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 0.5rem 1rem;
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.filter-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.filter-tab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ORDER CARD */
+.order-card {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.order-header {
+  padding: 1rem 1.5rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.order-id {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.order-date {
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.order-body {
+  padding: 1.5rem;
+}
+
+.order-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.order-info-row strong {
+  color: var(--primary);
+}
+
+.order-info-row.total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--gray-200);
+}
+
+/* TIMELINE */
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.timeline-step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-dot {
+  width: 32px;
+  height: 32px;
+  background: var(--gray-200);
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-step.completed .timeline-dot {
+  background: var(--success);
+  color: white;
+}
+
+.timeline-step.active .timeline-dot {
+  background: var(--warning);
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.timeline-step.cancelled .timeline-dot {
+  background: var(--danger);
+  color: white;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.timeline-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.timeline-step.completed .timeline-label,
+.timeline-step.active .timeline-label {
+  color: var(--text-dark);
+}
+
+/* Timeline line */
+.timeline-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--gray-200);
+  z-index: 0;
+}
+
+.timeline-step.completed:not(:last-child)::after {
+  background: var(--success);
+}
+
+.timeline-step.active:not(:last-child)::after {
+  background: linear-gradient(to right, var(--success), var(--warning));
+}
+
+/* ORDER ITEMS */
+.order-items {
+  background: var(--gray-50);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--gray-200);
+  font-size: 0.9rem;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+/* ORDER ACTIONS */
+.order-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn-cancel-order {
+  background: var(--danger);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-cancel-order:hover {
+  background: #dc2626;
+}
+
+/* CUSTOM CONFIRM MODAL */
+.confirm-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.confirm-modal.show {
+  display: flex;
+}
+
+.confirm-modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.confirm-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.confirm-modal-content h2 {
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.confirm-modal-content p {
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.confirm-actions .btn {
+  padding: 0.65rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* EMPTY STATE */
+.empty-orders {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-light);
+}
+
+.empty-orders .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}

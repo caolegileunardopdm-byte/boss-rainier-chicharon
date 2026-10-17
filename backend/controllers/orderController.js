@@ -10,7 +10,6 @@ exports.getOrders = async (req, res) => {
       .populate("admin_id", "full_name username")
       .sort({ createdAt: -1 });
 
-    // Kunin din ang items ng bawat order
     const ordersWithItems = await Promise.all(
       orders.map(async (order) => {
         const items = await OrderItem.find({ order_id: order._id }).populate(
@@ -49,10 +48,43 @@ exports.getOrder = async (req, res) => {
   }
 };
 
+// ==================== GET MY ORDERS (Customer's own orders) ====================
+exports.getMyOrders = async (req, res) => {
+  try {
+    // Kunin ang customer ID from JWT token
+    const customerId = req.user?.id || req.userId;
+
+    if (!customerId) {
+      return res.status(401).json({
+        success: false,
+        error: "Walang customer ID. Kailangan mag-login.",
+      });
+    }
+
+    const orders = await Order.find({ customer_id: customerId })
+      .populate("customer_id", "full_name email phone")
+      .sort({ createdAt: -1 });
+
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order) => {
+        const items = await OrderItem.find({ order_id: order._id }).populate(
+          "product_id",
+          "name price barcode image_url",
+        );
+        return { ...order.toObject(), items };
+      }),
+    );
+
+    res.json({ success: true, data: ordersWithItems });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 // ==================== CREATE order ====================
 exports.createOrder = async (req, res) => {
   try {
-    const { customer_id, items, pickup_date, pickup_time } = req.body;
+    const { customer_id, items, pickup_date, pickup_time, status } = req.body;
 
     if (!items || items.length === 0) {
       return res
@@ -65,12 +97,10 @@ exports.createOrder = async (req, res) => {
     for (const item of items) {
       const product = await Product.findById(item.product_id);
       if (!product) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: `Product not found: ${item.product_id}`,
-          });
+        return res.status(400).json({
+          success: false,
+          error: `Product not found: ${item.product_id}`,
+        });
       }
       if (product.stock_quantity < item.quantity) {
         return res.status(400).json({
@@ -81,12 +111,13 @@ exports.createOrder = async (req, res) => {
       total += product.price * item.quantity;
     }
 
-    // 2. Create order
+    // 2. Create order — 🆕 isama ang status (para sa auto-completed POS orders)
     const order = await Order.create({
       customer_id,
       total_amount: total,
       pickup_date,
       pickup_time,
+      status: status || "pending", // 🆕 Auto-completed kung provided
     });
 
     // 3. Create order items & reduce stock
