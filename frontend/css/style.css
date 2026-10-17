@@ -1936,3 +1936,13 @@ a:focus-visible {
   font-size: 0.9rem;
   font-weight: 600;
 }
+/* Cancel Button */
+.btn-cancel {
+  background: var(--danger, #ef4444);
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #dc2626;
+  color: white;
+}

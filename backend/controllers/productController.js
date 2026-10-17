@@ -95,11 +95,17 @@ exports.getProductByBarcode = async (req, res) => {
 
     const lastOrdered = lastOrderItem?.order_id?.order_date || null;
 
+    // 🆕 Kunin ang last sold data
+    const lastSold = lastOrderItem?.createdAt || null;
+    const lastSoldQty = lastOrderItem?.quantity || 0;
+
     res.json({
       success: true,
       data: {
         ...product.toObject(),
         last_ordered: lastOrdered,
+        last_sold: lastSold,
+        last_sold_quantity: lastSoldQty,
       },
     });
   } catch (error) {

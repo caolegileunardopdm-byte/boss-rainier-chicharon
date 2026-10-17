@@ -188,6 +188,7 @@ function addProductToCart(product) {
       unit_price: Number(product.price),
       quantity: 1,
       subtotal: Number(product.price),
+      expiration_date: product.expiration_date || null,
     });
   }
 
@@ -359,6 +360,7 @@ async function confirmCheckout() {
     })),
     pickup_date: new Date().toISOString(),
     pickup_time: `Walk-in (${paymentMethod.toUpperCase()})`,
+    status: "completed", // 🆕 AUTO-COMPLETE
   };
 
   const result = await apiCall("/orders", {
@@ -382,6 +384,7 @@ async function confirmCheckout() {
       quantity: item.quantity,
       price: item.unit_price,
       subtotal: item.subtotal,
+      expiration_date: item.expiration_date || null,
     })),
     total,
     paymentMethod: paymentMethod.toUpperCase(),
@@ -415,16 +418,25 @@ function printReceipt(order) {
   });
 
   const itemsHtml = order.items
-    .map(
-      (item) => `
+    .map((item) => {
+      let expDateHtml = "";
+      if (item.expiration_date) {
+        const exp = new Date(item.expiration_date);
+        expDateHtml = `<div style="font-size: 9px; color: #6b7280; padding-left: 3px;">📅 Expires: ${exp.toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}</div>`;
+      }
+
+      return `
     <tr>
-      <td>${item.name}</td>
+      <td>
+        ${item.name}
+        ${expDateHtml}
+      </td>
       <td style="text-align:center">${item.quantity}</td>
       <td style="text-align:right">₱${item.price.toFixed(2)}</td>
       <td style="text-align:right">₱${item.subtotal.toFixed(2)}</td>
     </tr>
-  `,
-    )
+  `;
+    })
     .join("");
 
   const html = `
@@ -523,11 +535,10 @@ async function loadOrders() {
 
   const result = await apiCall("/orders");
   if (!result.success) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-loading">Failed to load orders.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="table-loading">Failed to load orders.</td></tr>`;
     return;
   }
 
-  // Filter only walk-in orders (customer_id = walk-in)
   const walkInOrders = (result.data || []).filter(
     (o) =>
       o.customer_id === WALK_IN_CUSTOMER_ID ||
@@ -535,7 +546,7 @@ async function loadOrders() {
   );
 
   if (!walkInOrders.length) {
-    tbody.innerHTML = `<tr><td colspan="5" class="table-loading">Walang walk-in transactions.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="table-loading">Walang walk-in transactions.</td></tr>`;
     return;
   }
 
@@ -560,8 +571,36 @@ async function loadOrders() {
         <td>${itemsCount} item${itemsCount !== 1 ? "s" : ""}</td>
         <td><strong>₱${Number(o.total_amount || 0).toFixed(2)}</strong></td>
         <td>${o.status}</td>
+        <td>
+          <button class="btn-sm btn-cancel-order" onclick="cancelCashierOrder('${o._id}')">Cancel</button>
+        </td>
       </tr>
     `;
     })
     .join("");
+}
+
+// ============================================================
+// CANCEL ORDER (Cashier)
+// ============================================================
+async function cancelCashierOrder(orderId) {
+  if (
+    !confirm(
+      "Sigurado ka bang gusto mong i-cancel ang order na ito? Mabubura ito sa admin records.",
+    )
+  ) {
+    return;
+  }
+
+  const result = await apiCall(`/orders/${orderId}`, {
+    method: "DELETE",
+  });
+
+  if (!result.success) {
+    alert("Failed to cancel order: " + (result.error || "Unknown error"));
+    return;
+  }
+
+  alert("✅ Order cancelled and removed from records.");
+  loadOrders();
 }
