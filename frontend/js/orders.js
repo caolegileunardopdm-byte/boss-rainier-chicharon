@@ -385,7 +385,7 @@ function renderOrders() {
             .join("")}
         </div>
 
-        <div class="order-footer">
+                <div class="order-footer">
           <div class="order-pickup">
             📅 Pick-up: ${pickupDate} at ${order.pickup_time || "N/A"}
           </div>
@@ -393,8 +393,68 @@ function renderOrders() {
             Total: ${formatPrice(order.total_amount)}
           </div>
         </div>
+
+        ${
+          !["completed", "cancelled"].includes(order.status)
+            ? `
+          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
+            <button class="btn-cancel-order" onclick="confirmCancelOrder('${order._id}', '${order._id.slice(-8).toUpperCase()}')">
+              ❌ Cancel Order
+            </button>
+          </div>
+        `
+            : ""
+        }
       </div>
     `;
     })
     .join("");
+}
+// ============================================================
+// CANCEL ORDER (Custom Modal)
+// ============================================================
+let pendingCancelOrderId = null;
+
+function confirmCancelOrder(orderId, orderIdShort) {
+  pendingCancelOrderId = orderId;
+
+  document.getElementById("confirm-title").textContent = "Cancel Order?";
+  document.getElementById("confirm-message").innerHTML = `
+    Sigurado ka bang gusto mong i-cancel ang <strong>Order #${orderIdShort}</strong>?<br>
+    <span style="color: var(--danger); font-size: 0.85rem;">Hindi na ito maibabalik.</span>
+  `;
+
+  document.getElementById("confirm-ok-btn").onclick = () => {
+    closeConfirmModal();
+    doCancelOrder();
+  };
+
+  document.getElementById("confirm-modal").classList.add("show");
+}
+
+function closeConfirmModal() {
+  document.getElementById("confirm-modal").classList.remove("show");
+  pendingCancelOrderId = null;
+}
+
+async function doCancelOrder() {
+  if (!pendingCancelOrderId) return;
+
+  const result = await apiCall(`/orders/${pendingCancelOrderId}`, {
+    method: "PUT",
+    body: JSON.stringify({ status: "cancelled" }),
+  });
+
+  if (!result.success) {
+    alert("Failed to cancel order: " + (result.error || "Unknown error"));
+    return;
+  }
+
+  alert("✅ Order cancelled successfully.");
+
+  // Reload orders
+  const user = getCurrentUser();
+  if (user) {
+    loadOrders(user);
+  }
 }
