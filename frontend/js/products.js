@@ -22,6 +22,13 @@ function updateCartCount() {
 function updateAuthLinks() {
   const user = getCurrentUser();
   const authLinks = document.getElementById("auth-links");
+
+  // 🆕 Ipakita ang My Orders kung naka-login
+  const myOrdersNav = document.getElementById("my-orders-nav");
+  if (myOrdersNav) {
+    myOrdersNav.style.display = user ? "block" : "none";
+  }
+
   if (!authLinks) return;
 
   if (user) {

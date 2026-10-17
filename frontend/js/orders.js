@@ -36,6 +36,13 @@ function updateCartCount() {
 function updateAuthLinks() {
   const user = getCurrentUser();
   const authLinks = document.getElementById("auth-links");
+
+  // 🆕 Ipakita ang My Orders kung naka-login
+  const myOrdersNav = document.getElementById("my-orders-nav");
+  if (myOrdersNav) {
+    myOrdersNav.style.display = user ? "block" : "none";
+  }
+
   if (!authLinks) return;
 
   if (user) {
@@ -275,7 +282,7 @@ if (document.getElementById("orders-list")) {
 
 // ==================== LOAD ORDERS ====================
 async function loadOrders(user) {
-  const result = await apiCall("/orders");
+  const result = await apiCall("/orders/my-orders");
 
   if (!result.success || !result.data) {
     document.getElementById("orders-list").innerHTML = `
