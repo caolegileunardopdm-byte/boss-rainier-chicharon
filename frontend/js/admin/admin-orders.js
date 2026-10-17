@@ -64,9 +64,14 @@ function renderOrders() {
       <tr>
         <td><code>#${order._id.slice(-8).toUpperCase()}</code></td>
         <td>
-          <strong>${order.customer_id?.full_name || "N/A"}</strong><br>
-          <small style="color: var(--text-light);">${order.customer_id?.email || ""}</small>
-        </td>
+  <strong>${
+    order.customer_id?.full_name ||
+    '<em style="color: var(--text-light);">Walk-in Customer</em>'
+  }</strong><br>
+  <small style="color: var(--text-light);">${
+    order.customer_id?.email || ""
+  }</small>
+</td>
         <td>${items.length} item(s)</td>
         <td><strong>${formatPrice(order.total_amount)}</strong></td>
         <td>${pickupDate}<br><small style="color: var(--text-light);">${order.pickup_time || ""}</small></td>
@@ -141,15 +146,17 @@ async function viewOrder(orderId) {
     </div>
     <div class="detail-row">
       <span class="detail-label">Customer:</span>
-      <span class="detail-value">${order.customer_id?.full_name || "N/A"}</span>
+      <span class="detail-value">${
+        order.customer_id?.full_name || "Walk-in Customer"
+      }</span>
     </div>
     <div class="detail-row">
       <span class="detail-label">Email:</span>
-      <span class="detail-value">${order.customer_id?.email || "N/A"}</span>
+     <span class="detail-value">${order.customer_id?.email || "—"}</span>
     </div>
     <div class="detail-row">
       <span class="detail-label">Phone:</span>
-      <span class="detail-value">${order.customer_id?.phone || "N/A"}</span>
+      <span class="detail-value">${order.customer_id?.phone || "—"}</span>
     </div>
     <div class="detail-row">
       <span class="detail-label">Pick-up Date:</span>

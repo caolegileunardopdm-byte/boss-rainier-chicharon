@@ -83,7 +83,12 @@ async function loadRecentOrders() {
       (order) => `
     <tr>
       <td><code>#${order._id.slice(-8).toUpperCase()}</code></td>
-      <td>${order.customer_id?.full_name || "N/A"}</td>
+      <td>
+  ${
+    order.customer_id?.full_name ||
+    '<em style="color: var(--text-light);">Walk-in Customer</em>'
+  }
+</td>
       <td>${order.items?.length || 0} item(s)</td>
       <td><strong>${formatPrice(order.total_amount)}</strong></td>
       <td><span class="status-badge status-${order.status}">${order.status}</span></td>
