@@ -1,30 +1,30 @@
 // ==================== INITIALIZE ====================
 document.addEventListener("DOMContentLoaded", () => {
-  // Check if logged in
-  const user = getCurrentUser();
-  if (!user) {
-    alert("Please login first to checkout.");
-    window.location.href = "login.html";
-    return;
+  // Only run cart check if we're on checkout page (may place-order button)
+  const isCheckoutPage = document.getElementById("place-order-btn");
+
+  if (isCheckoutPage) {
+    const user = getCurrentUser();
+    if (!user) {
+      alert("Please login first to checkout.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (getCart().length === 0) {
+      alert("Your cart is empty.");
+      window.location.href = "cart.html";
+      return;
+    }
+
+    updateCartCount();
+    updateAuthLinks();
+    fillCustomerInfo(user);
+    renderOrderSummary();
+    setDefaultPickupDate();
+    handlePaymentChange();
   }
-
-  // Check if cart is empty
-  if (getCart().length === 0) {
-    alert("Your cart is empty.");
-    window.location.href = "cart.html";
-    return;
-  }
-
-  updateCartCount();
-  updateAuthLinks();
-  fillCustomerInfo(user);
-  renderOrderSummary();
-  setDefaultPickupDate();
-
-  // Initialize payment fields visibility
-  handlePaymentChange();
 });
-
 // ==================== UPDATE CART COUNT ====================
 function updateCartCount() {
   const count = getCartCount();
