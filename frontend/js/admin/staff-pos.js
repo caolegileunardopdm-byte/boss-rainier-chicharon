@@ -74,6 +74,11 @@ function showSection(name) {
   // Refresh data kung orders section
   if (name === "orders") loadOrders();
   if (name === "products") renderProductsList();
+  if (name === "online") {
+    // Clear search result on section switch
+    document.getElementById("online-order-result").innerHTML = "";
+    document.getElementById("online-order-search").value = "";
+  }
 }
 
 // ============================================================
@@ -603,4 +608,287 @@ async function cancelCashierOrder(orderId) {
 
   alert("✅ Order cancelled and removed from records.");
   loadOrders();
+}
+// ============================================================
+// ONLINE ORDERS (Search & Print)
+// ============================================================
+async function searchOnlineOrder() {
+  const input = document.getElementById("online-order-search");
+  const resultContainer = document.getElementById("online-order-result");
+  const orderCode = input.value.trim().toUpperCase();
+
+  if (!orderCode) {
+    alert("Please enter an order number.");
+    return;
+  }
+
+  resultContainer.innerHTML = `
+    <div style="text-align: center; padding: 2rem;">
+      <div class="spinner"></div>
+      <p style="color: var(--text-light); margin-top: 1rem;">Searching order...</p>
+    </div>
+  `;
+
+  // Kunin lahat ng orders
+  const result = await apiCall("/orders");
+
+  if (!result.success || !result.data) {
+    resultContainer.innerHTML = `
+      <div style="text-align: center; padding: 2rem; color: var(--danger);">
+        <p>❌ Failed to search orders. Please try again.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Hanapin ang order sa code (last 8 chars)
+  const foundOrder = result.data.find(
+    (o) => o._id.slice(-8).toUpperCase() === orderCode,
+  );
+
+  if (!foundOrder) {
+    resultContainer.innerHTML = `
+      <div style="text-align: center; padding: 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+        <h2 style="color: var(--danger); margin-bottom: 0.5rem;">Order Not Found</h2>
+        <p style="color: var(--text-light);">Walang order na may code: <strong>#${orderCode}</strong></p>
+      </div>
+    `;
+    return;
+  }
+
+  // I-display ang order details
+  renderOnlineOrderDetails(foundOrder);
+}
+
+function renderOnlineOrderDetails(order) {
+  const resultContainer = document.getElementById("online-order-result");
+
+  const items = order.items || [];
+  const itemsHtml = items
+    .map(
+      (item) => `
+    <tr>
+      <td>${item.name}</td>
+      <td style="text-align: center;">${item.quantity}</td>
+      <td style="text-align: right;">₱${item.unit_price.toFixed(2)}</td>
+      <td style="text-align: right;">₱${item.subtotal.toFixed(2)}</td>
+    </tr>
+  `,
+    )
+    .join("");
+
+  const customerName = order.customer_id?.full_name || "N/A";
+  const customerEmail = order.customer_id?.email || "N/A";
+  const customerPhone = order.customer_id?.phone || "N/A";
+  const orderDate = new Date(
+    order.order_date || order.createdAt,
+  ).toLocaleString("en-PH", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const pickupDate = order.pickup_date
+    ? new Date(order.pickup_date).toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
+    : "N/A";
+
+  resultContainer.innerHTML = `
+    <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); max-width: 800px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-200);">
+        <div>
+          <h2 style="color: var(--primary); margin-bottom: 0.25rem;">Order #${order._id.slice(-8).toUpperCase()}</h2>
+          <p style="color: var(--text-light); font-size: 0.9rem;">Placed: ${orderDate}</p>
+        </div>
+        <span class="status-badge status-${order.status}" style="font-size: 1rem; padding: 0.5rem 1rem;">
+          ${order.status.toUpperCase()}
+        </span>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem; text-transform: uppercase;">Customer Details</h3>
+        <p><strong>Name:</strong> ${customerName}</p>
+        <p><strong>Email:</strong> ${customerEmail}</p>
+        <p><strong>Phone:</strong> ${customerPhone}</p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem; text-transform: uppercase;">Pick-up Details</h3>
+        <p><strong>Date:</strong> ${pickupDate}</p>
+        <p><strong>Time:</strong> ${order.pickup_time || "N/A"}</p>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="color: var(--primary); font-size: 0.9rem; margin-bottom: 0.5rem; text-transform: uppercase;">Order Items</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--gray-200);">
+              <th style="text-align: left; padding: 0.5rem 0; font-size: 0.85rem; color: var(--text-light);">Item</th>
+              <th style="text-align: center; padding: 0.5rem 0; font-size: 0.85rem; color: var(--text-light);">Qty</th>
+              <th style="text-align: right; padding: 0.5rem 0; font-size: 0.85rem; color: var(--text-light);">Price</th>
+              <th style="text-align: right; padding: 0.5rem 0; font-size: 0.85rem; color: var(--text-light);">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid var(--gray-200); margin-bottom: 1.5rem;">
+        <span style="font-size: 1.1rem; font-weight: 600;">TOTAL:</span>
+        <span style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">₱${Number(order.total_amount).toFixed(2)}</span>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem;">
+        <button onclick="printOnlineOrderReceipt('${order._id}')" style="flex: 2; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+          🖨️ Print Receipt
+        </button>
+        <button onclick="clearOnlineSearch()" style="flex: 1; padding: 0.75rem; background: var(--gray-200); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          Clear
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function clearOnlineSearch() {
+  document.getElementById("online-order-search").value = "";
+  document.getElementById("online-order-result").innerHTML = "";
+}
+
+// ============================================================
+// PRINT RECEIPT FOR ONLINE ORDER
+// ============================================================
+async function printOnlineOrderReceipt(orderId) {
+  const result = await apiCall(`/orders/${orderId}`);
+
+  if (!result.success || !result.data) {
+    alert("Failed to load order details.");
+    return;
+  }
+
+  const order = result.data;
+
+  const itemsHtml = (order.items || [])
+    .map((item) => {
+      let expDateHtml = "";
+      if (item.product_id?.expiration_date) {
+        const exp = new Date(item.product_id.expiration_date);
+        expDateHtml = `<div style="font-size: 9px; color: #6b7280; padding-left: 3px;">📅 Expires: ${exp.toLocaleDateString("en-PH", { year: "numeric", month: "short", day: "numeric" })}</div>`;
+      }
+
+      return `
+      <tr>
+        <td>
+          ${item.name}
+          ${expDateHtml}
+        </td>
+        <td style="text-align:center">${item.quantity}</td>
+        <td style="text-align:right">₱${item.unit_price.toFixed(2)}</td>
+        <td style="text-align:right">₱${item.subtotal.toFixed(2)}</td>
+      </tr>
+    `;
+    })
+    .join("");
+
+  const customerName = order.customer_id?.full_name || "Walk-in Customer";
+  const dateStr = new Date(order.createdAt).toLocaleString("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Receipt ${order._id.slice(-8).toUpperCase()}</title>
+  <style>
+    @page { size: 58mm auto; margin: 2mm; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      width: 54mm;
+      padding: 3mm;
+      color: #000;
+    }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    h1 { font-size: 13px; margin-bottom: 2px; }
+    .subtitle { font-size: 9px; margin-bottom: 8px; }
+    .divider { border-top: 1px dashed #000; margin: 5px 0; }
+    .divider-solid { border-top: 1px solid #000; margin: 5px 0; }
+    .info { font-size: 9px; margin-bottom: 8px; }
+    .info-row { display: flex; justify-content: space-between; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th { text-align: left; font-size: 9px; border-bottom: 1px solid #000; padding: 3px 0; }
+    td { padding: 2px 0; vertical-align: top; }
+    .total-row { display: flex; justify-content: space-between; font-size: 10px; }
+    .total-final { font-size: 13px; font-weight: bold; margin-top: 3px; }
+    .thank-you { margin-top: 10px; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <h1>CRISPY CHICHARON</h1>
+    <div class="subtitle">Signature Chicharon</div>
+    <div class="subtitle">ni Mrs. Marissa Del Rosario</div>
+    <div class="subtitle">Patubig, Marilao, Bulacan</div>
+    <div class="subtitle">📞 0935069928</div>
+  </div>
+  <div class="divider"></div>
+  <div class="info">
+    <div class="info-row"><span>Order #:</span><span>${order._id.slice(-8).toUpperCase()}</span></div>
+    <div class="info-row"><span>Date:</span><span>${dateStr}</span></div>
+    <div class="info-row"><span>Customer:</span><span>${customerName}</span></div>
+  </div>
+  <div class="divider-solid"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="text-align:center">Qty</th>
+        <th style="text-align:right">Price</th>
+        <th style="text-align:right">Sub</th>
+      </tr>
+    </thead>
+    <tbody>${itemsHtml}</tbody>
+  </table>
+  <div class="divider-solid"></div>
+  <div class="total-row total-final">
+    <span>TOTAL</span>
+    <span>₱${order.total_amount.toFixed(2)}</span>
+  </div>
+  <div class="divider"></div>
+  <div class="info">
+    <div class="info-row"><span>Pickup Date:</span><span>${order.pickup_date ? new Date(order.pickup_date).toLocaleDateString("en-PH") : "N/A"}</span></div>
+    <div class="info-row"><span>Pickup Time:</span><span>${order.pickup_time || "N/A"}</span></div>
+  </div>
+  <div class="divider-solid"></div>
+  <div class="center thank-you">
+    <div class="bold">Salamat sa pagtangkilik!</div>
+    <div>Bisitahin kami muli 🐷</div>
+  </div>
+</body>
+</html>
+  `;
+
+  const printWindow = window.open("", "_blank", "width=400,height=600");
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.onload = () => {
+    printWindow.focus();
+    printWindow.print();
+  };
 }

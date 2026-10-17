@@ -14,7 +14,7 @@ exports.getOrders = async (req, res) => {
       orders.map(async (order) => {
         const items = await OrderItem.find({ order_id: order._id }).populate(
           "product_id",
-          "name price barcode",
+          "name price barcode image_url expiration_date",
         );
         return { ...order.toObject(), items };
       }),
@@ -39,7 +39,7 @@ exports.getOrder = async (req, res) => {
 
     const items = await OrderItem.find({ order_id: order._id }).populate(
       "product_id",
-      "name price barcode",
+      "name price barcode image_url expiration_date",
     );
 
     res.json({ success: true, data: { ...order.toObject(), items } });
@@ -69,7 +69,7 @@ exports.getMyOrders = async (req, res) => {
       orders.map(async (order) => {
         const items = await OrderItem.find({ order_id: order._id }).populate(
           "product_id",
-          "name price barcode image_url",
+          "name price barcode image_url expiration_date", // 🆕 Idinagdag
         );
         return { ...order.toObject(), items };
       }),

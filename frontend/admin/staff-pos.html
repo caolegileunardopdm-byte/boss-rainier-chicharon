@@ -72,6 +72,19 @@
               <a
                 href="#"
                 class="sidebar-link"
+                data-section="online"
+                onclick="
+                  showSection('online');
+                  return false;
+                "
+                >🌐 Online Orders</a
+              >
+            </li>
+            <!-- 🆕 BAGO -->
+            <li>
+              <a
+                href="#"
+                class="sidebar-link"
                 data-section="products"
                 onclick="
                   showSection('products');
@@ -162,6 +175,49 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </section>
+        <!-- ==================== ONLINE ORDERS SECTION ==================== -->
+        <section id="section-online" class="staff-section">
+          <h1 class="page-title">🌐 Online Orders</h1>
+          <p style="color: var(--text-light); margin-bottom: 1.5rem">
+            Search customer's order number to print receipt.
+          </p>
+
+          <!-- SEARCH BAR -->
+          <div
+            style="
+              display: flex;
+              gap: 0.75rem;
+              margin-bottom: 2rem;
+              max-width: 600px;
+            "
+          >
+            <input
+              type="text"
+              id="online-order-search"
+              placeholder="I-type o i-scan ang Order Number (e.g., DA45ED3C)..."
+              style="
+                flex: 1;
+                padding: 0.75rem 1rem;
+                border: 2px solid var(--gray-200);
+                border-radius: 8px;
+                font-size: 0.95rem;
+              "
+              onkeydown="if (event.key === 'Enter') searchOnlineOrder();"
+            />
+            <button
+              class="btn btn-primary"
+              onclick="searchOnlineOrder()"
+              style="padding: 0.75rem 1.5rem"
+            >
+              🔍 Search
+            </button>
+          </div>
+
+          <!-- RESULT AREA -->
+          <div id="online-order-result">
+            <!-- Result ilalabas dito -->
           </div>
         </section>
 

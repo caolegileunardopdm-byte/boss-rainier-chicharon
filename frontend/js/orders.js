@@ -385,7 +385,7 @@ function renderOrders() {
             .join("")}
         </div>
 
-                <div class="order-footer">
+                      <div class="order-footer">
           <div class="order-pickup">
             📅 Pick-up: ${pickupDate} at ${order.pickup_time || "N/A"}
           </div>
@@ -393,6 +393,18 @@ function renderOrders() {
             Total: ${formatPrice(order.total_amount)}
           </div>
         </div>
+
+        ${
+          order.status === "completed"
+            ? `
+          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
+            <button class="btn-download-code" onclick="showOrderCode('${order._id.slice(-8).toUpperCase()}')" style="background: var(--success, #10b981); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+              📥 Show Order Number
+            </button>
+          </div>
+        `
+            : ""
+        }
 
         ${
           !["completed", "cancelled"].includes(order.status)
@@ -457,4 +469,44 @@ async function doCancelOrder() {
   if (user) {
     loadOrders(user);
   }
+}
+// ============================================================
+// SHOW ORDER CODE MODAL (Customer)
+// ============================================================
+function showOrderCode(code) {
+  // Gumawa ng modal kung wala pa
+  let modal = document.getElementById("order-code-modal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "order-code-modal";
+    modal.style.cssText = `
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    `;
+    modal.innerHTML = `
+      <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 400px; width: 100%; text-align: center;">
+        <h2 style="color: var(--primary); margin-bottom: 1rem;">📱 Ipakita ito sa Staff</h2>
+        <p style="color: var(--text-light); margin-bottom: 1.5rem;">I-type o i-scan ng staff ang order code na ito para ma-print ang receipt.</p>
+        <div id="order-code-display" style="background: #fef3c7; padding: 2rem; border-radius: 12px; font-size: 2rem; font-family: monospace; font-weight: bold; color: var(--primary); letter-spacing: 0.1em; margin-bottom: 1.5rem;"></div>
+        <button onclick="closeOrderCodeModal()" style="padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%;">
+          Close
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  modal.style.display = "flex";
+  document.getElementById("order-code-display").textContent = code;
+}
+
+function closeOrderCodeModal() {
+  const modal = document.getElementById("order-code-modal");
+  if (modal) modal.style.display = "none";
 }
