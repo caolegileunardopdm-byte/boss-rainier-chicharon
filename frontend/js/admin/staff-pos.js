@@ -786,7 +786,32 @@ async function printOnlineOrderReceipt(orderId) {
   }
 
   const order = result.data;
+  // 🆕 AUTO-SAVE PAYMENT AS PAID PAG NAG-PRINT NG RECEIPT
+  if (order.status === "completed" || order.status === "ready") {
+    try {
+      const existing = await apiCall("/payments");
+      const hasPayment = existing.data?.some(
+        (p) => p.order_id === order._id || p.order_id?._id === order._id,
+      );
 
+      if (!hasPayment) {
+        await apiCall("/payments", {
+          method: "POST",
+          body: JSON.stringify({
+            order_id: order._id,
+            payment_method: "cash",
+            amount: order.total_amount,
+            status: "paid",
+            transaction_ref: `ONLINE-${order._id.slice(-8).toUpperCase()}`,
+            payment_details: {},
+          }),
+        });
+        console.log("✅ Payment auto-saved as Paid");
+      }
+    } catch (err) {
+      console.error("Payment save error:", err);
+    }
+  }
   const itemsHtml = (order.items || [])
     .map((item) => {
       let expDateHtml = "";

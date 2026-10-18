@@ -85,13 +85,6 @@ function renderPayments() {
         <td><strong>${formatPrice(p.amount)}</strong></td>
         <td><span class="status-badge status-${p.status}">${p.status}</span></td>
         <td><small style="color: var(--text-light);">${formatDate(p.payment_date || p.createdAt)}</small></td>
-        <td>
-          <div class="action-btns">
-            ${p.status === "pending" ? `<button class="btn-sm btn-paid" onclick="markAsPaid('${p._id}')">Mark Paid</button>` : ""}
-            ${p.status === "paid" ? `<button class="btn-sm btn-refund" onclick="markAsRefunded('${p._id}')">Refund</button>` : ""}
-            <button class="btn-sm btn-delete" onclick="deletePayment('${p._id}')">Delete</button>
-          </div>
-        </td>
       </tr>
     `;
     })
