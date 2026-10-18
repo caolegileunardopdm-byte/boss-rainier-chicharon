@@ -11,7 +11,7 @@
   let salesChart = null;
   let productsChart = null;
   let categoryChart = null;
-
+  let lossChart = null;
   // ============================================================
   // INIT
   // ============================================================
@@ -50,6 +50,7 @@
       renderSalesChart(orders, period);
       renderProductsChart(orders, period);
       renderCategoryChart(orders, period);
+      loadLossChart();
     } catch (err) {
       console.error("Error loading analytics:", err);
     }
@@ -398,5 +399,123 @@
         },
       },
     });
+  }
+  // ============================================================
+  // LOSS PRODUCTS CHART
+  // ============================================================
+  async function loadLossChart() {
+    try {
+      const result = await apiCall("/losses");
+      const canvas = document.getElementById("lossChart");
+
+      if (!canvas) {
+        console.error("lossChart canvas not found");
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+
+      if (lossChart) lossChart.destroy();
+
+      if (!result.success || !result.data || result.data.length === 0) {
+        document.getElementById("loss-summary").textContent =
+          "✅ Walang loss products — walang refunds na na-record.";
+        lossChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["No Loss Data"],
+            datasets: [
+              {
+                label: "Loss (₱)",
+                data: [0],
+                backgroundColor: ["#e5e7eb"],
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { callback: (value) => `₱${value}`, color: "#6b7280" },
+                grid: { color: "#e5e7eb" },
+              },
+              x: { ticks: { color: "#6b7280" }, grid: { display: false } },
+            },
+          },
+        });
+        return;
+      }
+
+      const productLosses = {};
+      result.data.forEach((loss) => {
+        const name = loss.product_name || "Unknown";
+        if (!productLosses[name]) productLosses[name] = 0;
+        productLosses[name] += Number(loss.total_loss || 0);
+      });
+
+      const sorted = Object.entries(productLosses)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+      const totalLoss = sorted.reduce((sum, [, v]) => sum + v, 0);
+
+      document.getElementById("loss-summary").innerHTML = `
+        <strong style="color: var(--danger, #ef4444);">Total Loss: ₱${totalLoss.toFixed(2)}</strong>
+        &nbsp;|&nbsp; ${result.data.length} refunded item${result.data.length !== 1 ? "s" : ""}
+      `;
+
+      lossChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: sorted.map(([name]) => name),
+          datasets: [
+            {
+              label: "Loss (₱)",
+              data: sorted.map(([, value]) => value),
+              backgroundColor: [
+                "#ef4444",
+                "#f87171",
+                "#fca5a5",
+                "#fecaca",
+                "#fee2e2",
+              ],
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "#991b1b",
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: (ctx) => `Loss: ₱${ctx.parsed.x.toFixed(2)}`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: { callback: (value) => `₱${value}`, color: "#6b7280" },
+              grid: { color: "#e5e7eb" },
+            },
+            y: {
+              ticks: { color: "#1f2937", font: { weight: "600" } },
+              grid: { display: false },
+            },
+          },
+        },
+      });
+    } catch (err) {
+      console.error("Error loading loss chart:", err);
+    }
   }
 })();
