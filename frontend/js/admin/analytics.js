@@ -164,7 +164,33 @@
       },
     });
   }
+  // ============================================================
+  // FILTER BY PERIOD
+  // ============================================================
+  function filterByPeriod(orders, period) {
+    const now = new Date();
+    let cutoff = new Date();
 
+    switch (period) {
+      case "daily":
+        cutoff.setDate(now.getDate() - 7);
+        break;
+      case "weekly":
+        cutoff.setDate(now.getDate() - 7 * 8);
+        break;
+      case "monthly":
+        cutoff.setMonth(now.getMonth() - 12);
+        break;
+      case "yearly":
+        cutoff.setFullYear(now.getFullYear() - 5);
+        break;
+    }
+
+    return orders.filter((o) => {
+      const d = new Date(o.order_date || o.createdAt);
+      return d >= cutoff;
+    });
+  }
   function groupByPeriod(orders, period) {
     const groups = {};
 
