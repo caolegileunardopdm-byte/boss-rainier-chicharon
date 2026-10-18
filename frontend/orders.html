@@ -274,6 +274,7 @@
         <button class="filter-tab" data-status="confirmed">Confirmed</button>
         <button class="filter-tab" data-status="ready">Ready</button>
         <button class="filter-tab" data-status="completed">Completed</button>
+        <button class="filter-tab" data-status="refunded">Refunded</button>
       </div>
 
       <!-- ORDERS LIST -->
@@ -304,6 +305,27 @@
           </button>
           <button class="btn btn-danger" id="confirm-ok-btn">
             Yes, Cancel Order
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ==================== REFUND CONFIRM MODAL ==================== -->
+    <div id="refund-modal" class="confirm-modal">
+      <div class="confirm-modal-content">
+        <div class="confirm-icon">🔄</div>
+        <h2 id="refund-title">Request Refund?</h2>
+        <p id="refund-message">
+          Sigurado ka bang gusto mong i-refund ang order na ito?<br />
+          <span style="color: var(--danger); font-size: 0.85rem"
+            >Kailangan mong pumunta sa store para ipakita ang order code.</span
+          >
+        </p>
+        <div class="confirm-actions">
+          <button class="btn btn-secondary" onclick="closeRefundModal()">
+            No, Cancel
+          </button>
+          <button class="btn btn-danger" id="refund-ok-btn">
+            Yes, Request Refund
           </button>
         </div>
       </div>

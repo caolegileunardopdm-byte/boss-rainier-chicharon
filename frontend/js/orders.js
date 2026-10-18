@@ -394,17 +394,20 @@ function renderOrders() {
           </div>
         </div>
 
-        ${
-          order.status === "completed"
-            ? `
-          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
+              ${
+                order.status === "completed"
+                  ? `
+          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap;">
             <button class="btn-download-code" onclick="showOrderCode('${order._id.slice(-8).toUpperCase()}')" style="background: var(--success, #10b981); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
               📥 Show Order Number
             </button>
+            <button class="btn-refund" onclick="confirmRefundCustomer('${order._id}', '${order._id.slice(-8).toUpperCase()}')" style="background: var(--danger, #ef4444); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+              🔄 Refund
+            </button>
           </div>
         `
-            : ""
-        }
+                  : ""
+              }
 
         ${
           !["completed", "cancelled"].includes(order.status)
@@ -509,4 +512,58 @@ function showOrderCode(code) {
 function closeOrderCodeModal() {
   const modal = document.getElementById("order-code-modal");
   if (modal) modal.style.display = "none";
+}
+// ============================================================
+// REFUND REQUEST (Customer)
+// ============================================================
+let pendingRefundOrderId = null;
+
+function confirmRefundCustomer(orderId, orderCode) {
+  pendingRefundOrderId = orderId;
+
+  document.getElementById("refund-title").textContent = "Request Refund?";
+  document.getElementById("refund-message").innerHTML = `
+    Sigurado ka bang gusto mong i-refund ang <strong>Order #${orderCode}</strong>?<br><br>
+    <strong>Paano:</strong><br>
+    1. Pumunta sa store.<br>
+    2. Ipakita ang order code sa staff.<br>
+    3. I-verify ng staff at i-process ang refund.
+  `;
+
+  document.getElementById("refund-ok-btn").onclick = () => {
+    closeRefundModal();
+    doRefundRequest();
+  };
+
+  document.getElementById("refund-modal").classList.add("show");
+}
+
+function closeRefundModal() {
+  document.getElementById("refund-modal").classList.remove("show");
+  pendingRefundOrderId = null;
+}
+
+async function doRefundRequest() {
+  if (!pendingRefundOrderId) return;
+
+  const result = await apiCall(
+    `/orders/${pendingRefundOrderId}/refund-request`,
+    {
+      method: "PUT",
+      body: JSON.stringify({}),
+    },
+  );
+
+  if (!result.success) {
+    alert("❌ Failed to request refund: " + (result.error || "Unknown error"));
+    return;
+  }
+
+  alert("✅ Refund request submitted! Pumunta sa store para i-process.");
+  closeRefundModal();
+
+  const user = getCurrentUser();
+  if (user) {
+    loadOrders(user);
+  }
 }
