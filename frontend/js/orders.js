@@ -409,17 +409,17 @@ function renderOrders() {
                   : ""
               }
 
-        ${
-          !["completed", "cancelled"].includes(order.status)
-            ? `
+            ${
+              !["completed", "cancelled", "refunded"].includes(order.status)
+                ? `
           <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
             <button class="btn-cancel-order" onclick="confirmCancelOrder('${order._id}', '${order._id.slice(-8).toUpperCase()}')">
               ❌ Cancel Order
             </button>
           </div>
         `
-            : ""
-        }
+                : ""
+            }
       </div>
     `;
     })
