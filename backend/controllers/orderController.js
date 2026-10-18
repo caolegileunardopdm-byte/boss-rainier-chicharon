@@ -205,12 +205,26 @@ exports.refundOrder = async (req, res) => {
 
     await order.save();
 
-    // Note: Hindi natin binura ang items para may record tayo,
-    // pero ibabawas natin ang amount na ito sa Net Sales sa Analytics.
+    // 🆕 2. I-save sa Loss collection
+    const Loss = require("../models/Loss");
+    const orderItems = await OrderItem.find({ order_id: order._id });
+
+    for (const item of orderItems) {
+      await Loss.create({
+        order_id: order._id,
+        product_id: item.product_id,
+        product_name: item.name,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_loss: item.subtotal,
+        reason: "refund",
+        refunded_by: staff_id || null,
+      });
+    }
 
     res.json({
       success: true,
-      message: "Order refunded successfully",
+      message: "Order refunded and recorded as loss",
       data: order,
     });
   } catch (error) {

@@ -61,24 +61,28 @@
   function updateStats(orders, period) {
     const filtered = filterByPeriod(orders, period);
 
-    // 1. Gross Sales (Completed lang)
-    const grossSales = filtered
-      .filter((o) => o.status === "completed")
-      .reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+    // ✅ TANGGALIN ANG REFUNDED SA SALES
+    const salesOnly = filtered.filter((o) => o.status === "completed");
 
-    // 2. Total Refunds
+    // 1. Gross Sales (Completed lang)
+    const grossSales = salesOnly.reduce(
+      (sum, o) => sum + Number(o.total_amount || 0),
+      0,
+    );
+
+    // 2. Total Refunds (for tooltip)
     const totalRefunds = filtered
       .filter((o) => o.status === "refunded")
       .reduce((sum, o) => sum + Number(o.refund_amount || 0), 0);
 
-    // 3. Net Sales (Gross - Refunds)
+    // 3. Net Sales
     const netSales = grossSales - totalRefunds;
 
-    // 4. Order Count (exclude refunded)
-    const orderCount = filtered.filter((o) => o.status !== "refunded").length;
-    const average = orderCount > 0 ? netSales / orderCount : 0;
+    // 4. Order Count (Completed lang)
+    const orderCount = salesOnly.length;
+    const average = orderCount > 0 ? grossSales / orderCount : 0;
 
-    // 5. Today's Sales (Completed lang ngayong araw)
+    // 5. Today's Sales (Completed lang)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todaySales = orders
@@ -105,6 +109,7 @@
   // CHART 1: SALES OVER TIME
   // ============================================================
   function renderSalesChart(orders, period) {
+    const salesOnly = orders.filter((o) => o.status !== "refunded");
     const data = groupByPeriod(orders, period);
     const ctx = document.getElementById("salesChart").getContext("2d");
 
@@ -239,7 +244,9 @@
   // CHART 2: TOP SELLING PRODUCTS
   // ============================================================
   function renderProductsChart(orders, period) {
-    const filtered = filterByPeriod(orders, period);
+    const filtered = filterByPeriod(orders, period).filter(
+      (o) => o.status !== "refunded",
+    );
     const productTotals = {};
 
     filtered.forEach((o) => {
@@ -308,7 +315,9 @@
   // CHART 3: SALES BY CATEGORY
   // ============================================================
   function renderCategoryChart(orders, period) {
-    const filtered = filterByPeriod(orders, period);
+    const filtered = filterByPeriod(orders, period).filter(
+      (o) => o.status !== "refunded",
+    );
     const categoryTotals = {};
 
     filtered.forEach((o) => {
