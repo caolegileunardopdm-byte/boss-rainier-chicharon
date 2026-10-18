@@ -18,7 +18,15 @@ const OrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "ready", "completed", "cancelled"],
+      // 🆕 IDINAGDAG ANG "refunded"
+      enum: [
+        "pending",
+        "confirmed",
+        "ready",
+        "completed",
+        "cancelled",
+        "refunded",
+      ],
       default: "pending",
     },
     total_amount: {
@@ -32,6 +40,20 @@ const OrderSchema = new mongoose.Schema(
     pickup_time: {
       type: String,
       default: "",
+    },
+    // 🆕 MGA BAGONG FIELDS PARA SA REFUND
+    refunded_at: {
+      type: Date,
+      default: null,
+    },
+    refunded_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    refund_amount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },

@@ -56,56 +56,49 @@
   }
 
   // ============================================================
-  // STATS CARDS
+  // STATS CARDS (With Refund Deduction)
   // ============================================================
   function updateStats(orders, period) {
     const filtered = filterByPeriod(orders, period);
 
-    const totalSales = filtered.reduce(
-      (sum, o) => sum + Number(o.total_amount || 0),
-      0,
-    );
-    const orderCount = filtered.length;
-    const average = orderCount > 0 ? totalSales / orderCount : 0;
+    // 1. Gross Sales (Completed lang)
+    const grossSales = filtered
+      .filter((o) => o.status === "completed")
+      .reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
 
+    // 2. Total Refunds
+    const totalRefunds = filtered
+      .filter((o) => o.status === "refunded")
+      .reduce((sum, o) => sum + Number(o.refund_amount || 0), 0);
+
+    // 3. Net Sales (Gross - Refunds)
+    const netSales = grossSales - totalRefunds;
+
+    // 4. Order Count (exclude refunded)
+    const orderCount = filtered.filter((o) => o.status !== "refunded").length;
+    const average = orderCount > 0 ? netSales / orderCount : 0;
+
+    // 5. Today's Sales (Completed lang ngayong araw)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todaySales = orders
-      .filter((o) => new Date(o.order_date || o.createdAt) >= today)
+      .filter(
+        (o) =>
+          new Date(o.order_date || o.createdAt) >= today &&
+          o.status === "completed",
+      )
       .reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
 
-    document.getElementById("stat-total").textContent =
-      `₱${totalSales.toFixed(2)}`;
+    // 6. Display
+    const totalEl = document.getElementById("stat-total");
+    totalEl.textContent = `₱${netSales.toFixed(2)}`;
+    totalEl.title = `Gross: ₱${grossSales.toFixed(2)} | Refunds: ₱${totalRefunds.toFixed(2)}`;
+
     document.getElementById("stat-orders").textContent = orderCount;
     document.getElementById("stat-average").textContent =
       `₱${average.toFixed(2)}`;
     document.getElementById("stat-today").textContent =
       `₱${todaySales.toFixed(2)}`;
-  }
-
-  function filterByPeriod(orders, period) {
-    const now = new Date();
-    let cutoff = new Date();
-
-    switch (period) {
-      case "daily":
-        cutoff.setDate(now.getDate() - 7);
-        break;
-      case "weekly":
-        cutoff.setDate(now.getDate() - 7 * 8);
-        break;
-      case "monthly":
-        cutoff.setMonth(now.getMonth() - 12);
-        break;
-      case "yearly":
-        cutoff.setFullYear(now.getFullYear() - 5);
-        break;
-    }
-
-    return orders.filter((o) => {
-      const d = new Date(o.order_date || o.createdAt);
-      return d >= cutoff;
-    });
   }
 
   // ============================================================

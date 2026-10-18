@@ -746,11 +746,22 @@ function renderOnlineOrderDetails(order) {
         <span style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">₱${Number(order.total_amount).toFixed(2)}</span>
       </div>
 
-      <div style="display: flex; gap: 0.75rem;">
-        <button onclick="printOnlineOrderReceipt('${order._id}')" style="flex: 2; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button onclick="printOnlineOrderReceipt('${order._id}')" style="flex: 2; min-width: 150px; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
           🖨️ Print Receipt
         </button>
-        <button onclick="clearOnlineSearch()" style="flex: 1; padding: 0.75rem; background: var(--gray-200); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        
+        ${
+          order.status !== "refunded" && order.status !== "cancelled"
+            ? `
+          <button onclick="confirmRefundOrder('${order._id}', '${order._id.slice(-8).toUpperCase()}')" style="flex: 1; min-width: 150px; padding: 0.75rem; background: var(--danger, #ef4444); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem;">
+            🔄 Refund Item
+          </button>
+          `
+            : ""
+        }
+
+        <button onclick="clearOnlineSearch()" style="flex: 1; min-width: 100px; padding: 0.75rem; background: var(--gray-200); color: var(--text-dark); border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           Clear
         </button>
       </div>
@@ -891,4 +902,33 @@ async function printOnlineOrderReceipt(orderId) {
     printWindow.focus();
     printWindow.print();
   };
+}
+// ============================================================
+// REFUND ORDER (Staff)
+// ============================================================
+async function confirmRefundOrder(orderId, orderCode) {
+  if (
+    !confirm(
+      `⚠️ I-REFUND ANG ORDER #${orderCode}?\n\nMababawas ito sa Total Sales at mare-record bilang Loss. Hindi na ito maibabalik.`,
+    )
+  ) {
+    return;
+  }
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const result = await apiCall(`/orders/${orderId}/refund`, {
+    method: "PUT",
+    body: JSON.stringify({ staff_id: user._id }),
+  });
+
+  if (!result.success) {
+    alert("❌ Failed to refund order: " + (result.error || "Unknown error"));
+    return;
+  }
+
+  alert("✅ Order refunded successfully! Bawas na ito sa Total Sales.");
+
+  // I-refresh ang search para makita ang bagong status
+  searchOnlineOrder();
 }

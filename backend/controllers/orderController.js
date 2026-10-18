@@ -178,3 +178,42 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// ==================== REFUND ORDER (Staff) ====================
+exports.refundOrder = async (req, res) => {
+  try {
+    const { staff_id } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    // Pwede i-refund kung Completed, Pending, o Confirmed pa lang
+    if (!["completed", "pending", "confirmed"].includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        error:
+          "Hindi pwedeng i-refund. Completed, Pending, o Confirmed lang ang pwedeng i-refund.",
+      });
+    }
+
+    // 1. I-update ang status to refunded
+    order.status = "refunded";
+    order.refunded_at = new Date();
+    order.refunded_by = staff_id || null;
+    order.refund_amount = order.total_amount; // Ibinalik lahat ng pera
+
+    await order.save();
+
+    // Note: Hindi natin binura ang items para may record tayo,
+    // pero ibabawas natin ang amount na ito sa Net Sales sa Analytics.
+
+    res.json({
+      success: true,
+      message: "Order refunded successfully",
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
