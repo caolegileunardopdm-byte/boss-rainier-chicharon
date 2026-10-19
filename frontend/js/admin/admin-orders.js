@@ -64,14 +64,14 @@ function renderOrders() {
       <tr>
         <td><code>#${order._id.slice(-8).toUpperCase()}</code></td>
         <td>
-  <strong>${
-    order.customer_id?.full_name ||
-    '<em style="color: var(--text-light);">Walk-in Customer</em>'
-  }</strong><br>
-  <small style="color: var(--text-light);">${
-    order.customer_id?.email || ""
-  }</small>
-</td>
+          <strong>${
+            order.customer_id?.full_name ||
+            '<em style="color: var(--text-light);">Walk-in Customer</em>'
+          }</strong><br>
+          <small style="color: var(--text-light);">${
+            order.customer_id?.email || ""
+          }</small>
+        </td>
         <td>${items.length} item(s)</td>
         <td><strong>${formatPrice(order.total_amount)}</strong></td>
         <td>${pickupDate}<br><small style="color: var(--text-light);">${order.pickup_time || ""}</small></td>
@@ -93,7 +93,7 @@ function getStatusButtons(order) {
   const status = order.status;
   const id = order._id;
 
-  // 🆕 PARA SA CANCEL REQUEST
+  // 🆕 PARA SA CANCEL REQUEST (Galing kay Customer)
   if (status === "cancel_requested") {
     return `
       <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')" style="background: var(--danger, #ef4444); color: white;">Approve Cancel</button>
@@ -113,9 +113,20 @@ function getStatusButtons(order) {
   }
   return "";
 }
+
 // ==================== UPDATE STATUS ====================
 async function updateStatus(orderId, newStatus) {
-  if (!confirm(`Change order status to "${newStatus}"?`)) return;
+  // 🆕 Custom message depende sa action
+  let message = `Change order status to "${newStatus}"?`;
+  if (newStatus === "cancelled") {
+    message =
+      "Sigurado ka bang gusto mong i-approve ang CANCEL request? Ibabalik ang stock sa inventory.";
+  } else if (newStatus === "pending") {
+    message =
+      "Sigurado ka bang gusto mong i-REJECT ang cancel request? Babalik ito sa Pending status.";
+  }
+
+  if (!confirm(message)) return;
 
   const result = await apiCall(`/orders/${orderId}/status`, {
     method: "PUT",

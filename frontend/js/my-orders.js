@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // LOAD ORDERS
 async function loadMyOrders() {
   const container = document.getElementById("orders-list");
-
   const result = await apiCall("/orders/my-orders");
 
   if (!result.success) {
@@ -50,7 +49,6 @@ async function loadMyOrders() {
 // RENDER ORDERS
 function renderOrders() {
   const container = document.getElementById("orders-list");
-
   let filtered = allOrders;
   if (currentFilter !== "all") {
     filtered = allOrders.filter((o) => o.status === currentFilter);
@@ -107,7 +105,9 @@ function renderOrderCard(order) {
 
   const timelineHtml = renderTimeline(order.status);
 
-  const canCancel = !["completed", "cancelled"].includes(order.status);
+  // 🆕 LOGIC PARA SA CANCEL BUTTON
+  // Pwede i-cancel kung pending, confirmed, o ready
+  const canCancel = ["pending", "confirmed", "ready"].includes(order.status);
   const cancelBtn = canCancel
     ? `<button class="btn-cancel-order" onclick="confirmCancelOrder('${order._id}', '${orderId}')">Cancel Order</button>`
     : "";
@@ -160,6 +160,17 @@ function renderTimeline(status) {
     { key: "completed", label: "Completed", icon: "🎉" },
   ];
 
+  // 🆕 KUNG NAG-REQUEST NG CANCEL
+  if (status === "cancel_requested") {
+    return `
+      <div class="timeline-step cancelled" style="width: 100%;">
+        <div class="timeline-dot">⏳</div>
+        <div class="timeline-label">Wait Admin Respond</div>
+      </div>
+    `;
+  }
+
+  // KUNG CANCELLED NA TALAGA
   if (status === "cancelled") {
     return `
       <div class="timeline-step cancelled" style="width: 100%;">
@@ -176,19 +187,16 @@ function renderTimeline(status) {
     .map((step, index) => {
       const stepIndex = statusOrder.indexOf(step.key);
       let className = "";
-
-      if (stepIndex < currentIndex) {
-        className = "completed";
-      } else if (stepIndex === currentIndex) {
+      if (stepIndex < currentIndex) className = "completed";
+      else if (stepIndex === currentIndex)
         className = step.key === "completed" ? "completed" : "active";
-      }
 
       return `
-        <div class="timeline-step ${className}">
-          <div class="timeline-dot">${step.icon}</div>
-          <div class="timeline-label">${step.label}</div>
-        </div>
-      `;
+      <div class="timeline-step ${className}">
+        <div class="timeline-dot">${step.icon}</div>
+        <div class="timeline-label">${step.label}</div>
+      </div>
+    `;
     })
     .join("");
 }
@@ -196,11 +204,9 @@ function renderTimeline(status) {
 // FILTER
 function filterOrders(status) {
   currentFilter = status;
-
   document.querySelectorAll(".filter-tab").forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.status === status);
   });
-
   renderOrders();
 }
 
@@ -209,11 +215,10 @@ let pendingCancelOrderId = null;
 
 function confirmCancelOrder(orderId, orderIdShort) {
   pendingCancelOrderId = orderId;
-
   document.getElementById("confirm-title").textContent = "Cancel Order?";
   document.getElementById("confirm-message").innerHTML = `
     Sigurado ka bang gusto mong i-cancel ang <strong>Order #${orderIdShort}</strong>?<br>
-    <span style="color: var(--danger); font-size: 0.85rem;">Hindi na ito maibabalik.</span>
+    <span style="color: var(--danger); font-size: 0.85rem;">Ipapadala ito sa admin para i-approve.</span>
   `;
 
   document.getElementById("confirm-ok-btn").onclick = () => {
@@ -229,26 +234,23 @@ function closeConfirmModal() {
   pendingCancelOrderId = null;
 }
 
+// 🆕 BAGONG DO CANCEL (MAG-REQUEST LANG SA ADMIN)
 async function doCancelOrder() {
   if (!pendingCancelOrderId) return;
 
-  const result = await apiCall(`/orders/${pendingCancelOrderId}`, {
-    method: "PUT",
-    body: JSON.stringify({ status: "cancelled" }),
-  });
+  // Tatawagin ang bagong route na ginawa natin
+  const result = await apiCall(
+    `/orders/${pendingCancelOrderId}/cancel-request`,
+    {
+      method: "PUT",
+    },
+  );
 
   if (!result.success) {
-    const deleteResult = await apiCall(`/orders/${pendingCancelOrderId}`, {
-      method: "DELETE",
-    });
-
-    if (!deleteResult.success) {
-      alert(
-        "Failed to cancel order: " + (deleteResult.error || "Unknown error"),
-      );
-      return;
-    }
+    alert("Failed to request cancel: " + (result.error || "Unknown error"));
+    return;
   }
 
-  loadMyOrders();
+  alert("✅ Request sent! Wait for admin to respond.");
+  loadMyOrders(); // I-refresh ang listahan para lumabas ang "Wait Admin Respond"
 }

@@ -455,7 +455,6 @@ function confirmCancelOrder(orderId, orderIdShort) {
   pendingCancelOrderId = orderId;
 
   document.getElementById("confirm-title").textContent = "Cancel Order?";
-  // 🆕 PALITAN ITO NG ENGLISH
   document.getElementById("confirm-message").innerHTML = `
     Are you sure you want to cancel <strong>Order #${orderIdShort}</strong>?<br>
     <span style="color: var(--danger); font-size: 0.85rem;">This action cannot be undone. The admin will review your request.</span>
