@@ -93,17 +93,20 @@ function getStatusButtons(order) {
   const status = order.status;
   const id = order._id;
 
-  if (status === "pending") {
+  // 🆕 PARA SA CANCEL REQUEST
+  if (status === "cancel_requested") {
     return `
-      <button class="btn-sm btn-confirm" onclick="updateStatus('${id}', 'confirmed')">Confirm</button>
-      <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')">Cancel</button>
+      <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')" style="background: var(--danger, #ef4444); color: white;">Approve Cancel</button>
+      <button class="btn-sm btn-view" onclick="updateStatus('${id}', 'pending')">Reject</button>
     `;
   }
+
+  // Normal Flow
+  if (status === "pending") {
+    return `<button class="btn-sm btn-confirm" onclick="updateStatus('${id}', 'confirmed')">Confirm</button>`;
+  }
   if (status === "confirmed") {
-    return `
-      <button class="btn-sm btn-ready" onclick="updateStatus('${id}', 'ready')">Ready</button>
-      <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')">Cancel</button>
-    `;
+    return `<button class="btn-sm btn-ready" onclick="updateStatus('${id}', 'ready')">Ready</button>`;
   }
   if (status === "ready") {
     return `<button class="btn-sm btn-complete" onclick="updateStatus('${id}', 'completed')">Complete</button>`;

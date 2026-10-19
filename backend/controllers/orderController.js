@@ -165,14 +165,27 @@ exports.createOrder = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true, runValidators: true },
-    );
+
+    const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ success: false, error: "Order not found" });
     }
+
+    // 🆕 Ibalik ang stock KAPAG mag-cancel (Approve)
+    if (status === "cancelled" && order.status !== "cancelled") {
+      const orderItems = await OrderItem.find({ order_id: order._id });
+      for (const item of orderItems) {
+        await Product.findByIdAndUpdate(item.product_id, {
+          $inc: { stock_quantity: item.quantity },
+        });
+      }
+      console.log(`✅ Stock returned for order ${order._id}`);
+    }
+
+    // I-update ang status
+    order.status = status;
+    await order.save();
+
     res.json({ success: true, data: order });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

@@ -18,7 +18,6 @@ const OrderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      // 🆕 IDINAGDAG ANG "refunded"
       enum: [
         "pending",
         "confirmed",
@@ -26,6 +25,7 @@ const OrderSchema = new mongoose.Schema(
         "completed",
         "cancelled",
         "refunded",
+        "cancel_requested",
       ],
       default: "pending",
     },

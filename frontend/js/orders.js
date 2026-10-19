@@ -366,7 +366,15 @@ function renderOrders() {
             <div class="order-id">Order #${order._id.slice(-8).toUpperCase()}</div>
             <div class="order-date">Placed: ${formatDate(order.createdAt)}</div>
           </div>
-          <span class="order-status ${statusClass}">${order.status}</span>
+          
+          <!-- 🆕 SPECIAL STATUS DISPLAY PARA SA CANCEL REQUEST -->
+          ${
+            order.status === "cancel_requested"
+              ? `<span class="order-status" style="background: #fef3c7; color: #92400e; display: flex; align-items: center; gap: 5px; border: 1px solid #f59e0b;">
+                   <span style="font-size: 14px;">⏳</span> Cancellation Pending
+                 </span>`
+              : `<span class="order-status ${statusClass}">${order.status}</span>`
+          }
         </div>
 
         <div class="order-items">
@@ -385,7 +393,19 @@ function renderOrders() {
             .join("")}
         </div>
 
-                      <div class="order-footer">
+        <!-- 🆕 ENGLISH WARNING MESSAGE -->
+        ${
+          order.status === "cancel_requested"
+            ? `<div style="padding: 1rem; background: #fef3c7; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #f59e0b;">
+                 <strong style="color: #92400e;">⏳ Cancellation Requested</strong>
+                 <p style="color: #92400e; font-size: 0.85rem; margin-top: 0.25rem;">
+                   Your cancellation request is currently being reviewed by the admin. Please wait for approval.
+                 </p>
+               </div>`
+            : ""
+        }
+
+        <div class="order-footer">
           <div class="order-pickup">
             📅 Pick-up: ${pickupDate} at ${order.pickup_time || "N/A"}
           </div>
@@ -394,32 +414,18 @@ function renderOrders() {
           </div>
         </div>
 
-              ${
-                order.status === "completed"
-                  ? `
-          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap;">
-            <button class="btn-download-code" onclick="showOrderCode('${order._id.slice(-8).toUpperCase()}')" style="background: var(--success, #10b981); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
-              📥 Show Order Number
-            </button>
-            <button class="btn-refund" onclick="confirmRefundCustomer('${order._id}', '${order._id.slice(-8).toUpperCase()}')" style="background: var(--danger, #ef4444); color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
-              🔄 Refund
-            </button>
-          </div>
-        `
-                  : ""
-              }
-
-            ${
-              !["completed", "cancelled", "refunded"].includes(order.status)
-                ? `
+        <!-- 🆕 CANCEL BUTTON (Naka-hide kung completed, cancelled, o cancel_requested) -->
+        ${
+          !["completed", "cancelled", "cancel_requested"].includes(order.status)
+            ? `
           <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
             <button class="btn-cancel-order" onclick="confirmCancelOrder('${order._id}', '${order._id.slice(-8).toUpperCase()}')">
               ❌ Cancel Order
             </button>
           </div>
         `
-                : ""
-            }
+            : ""
+        }
       </div>
     `;
     })
@@ -457,21 +463,20 @@ async function doCancelOrder() {
 
   const result = await apiCall(`/orders/${pendingCancelOrderId}`, {
     method: "PUT",
-    body: JSON.stringify({ status: "cancelled" }),
+    body: JSON.stringify({ status: "cancel_requested" }), // 🆕 Bagong status
   });
 
   if (!result.success) {
-    alert("Failed to cancel order: " + (result.error || "Unknown error"));
+    alert(
+      "❌ Failed to request cancellation: " + (result.error || "Unknown error"),
+    );
     return;
   }
 
-  alert("✅ Order cancelled successfully.");
+  alert("✅ Cancel request submitted. Please wait for admin approval.");
 
-  // Reload orders
   const user = getCurrentUser();
-  if (user) {
-    loadOrders(user);
-  }
+  if (user) loadOrders(user);
 }
 // ============================================================
 // SHOW ORDER CODE MODAL (Customer)
