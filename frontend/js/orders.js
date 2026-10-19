@@ -415,13 +415,28 @@ function renderOrders() {
         </div>
 
         <!-- 🆕 CANCEL BUTTON (Naka-hide kung completed, cancelled, o cancel_requested) -->
-        ${
-          !["completed", "cancelled", "cancel_requested"].includes(order.status)
-            ? `
+              ${
+                ![
+                  "completed",
+                  "cancelled",
+                  "refunded",
+                  "cancel_requested",
+                ].includes(order.status)
+                  ? `
           <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: right;">
             <button class="btn-cancel-order" onclick="confirmCancelOrder('${order._id}', '${order._id.slice(-8).toUpperCase()}')">
               ❌ Cancel Order
             </button>
+          </div>
+        `
+                  : ""
+              }
+
+        ${
+          order.status === "cancel_requested"
+            ? `
+          <div class="order-actions" style="padding: 1rem; border-top: 1px solid #eee; text-align: center;">
+            <p style="color: #92400e; font-weight: 600;">⏳ Waiting for admin response...</p>
           </div>
         `
             : ""
@@ -440,9 +455,10 @@ function confirmCancelOrder(orderId, orderIdShort) {
   pendingCancelOrderId = orderId;
 
   document.getElementById("confirm-title").textContent = "Cancel Order?";
+  // 🆕 PALITAN ITO NG ENGLISH
   document.getElementById("confirm-message").innerHTML = `
-    Sigurado ka bang gusto mong i-cancel ang <strong>Order #${orderIdShort}</strong>?<br>
-    <span style="color: var(--danger); font-size: 0.85rem;">Hindi na ito maibabalik.</span>
+    Are you sure you want to cancel <strong>Order #${orderIdShort}</strong>?<br>
+    <span style="color: var(--danger); font-size: 0.85rem;">This action cannot be undone. The admin will review your request.</span>
   `;
 
   document.getElementById("confirm-ok-btn").onclick = () => {
@@ -461,9 +477,10 @@ function closeConfirmModal() {
 async function doCancelOrder() {
   if (!pendingCancelOrderId) return;
 
+  // 🆕 PALITAN ITO
   const result = await apiCall(`/orders/${pendingCancelOrderId}`, {
     method: "PUT",
-    body: JSON.stringify({ status: "cancel_requested" }), // 🆕 Bagong status
+    body: JSON.stringify({ status: "cancel_requested" }),
   });
 
   if (!result.success) {
@@ -473,7 +490,8 @@ async function doCancelOrder() {
     return;
   }
 
-  alert("✅ Cancel request submitted. Please wait for admin approval.");
+  // 🆕 ENGLISH ALERT
+  alert("✅ Cancel request submitted. Waiting for admin response.");
 
   const user = getCurrentUser();
   if (user) loadOrders(user);
