@@ -777,6 +777,9 @@ function clearOnlineSearch() {
 // ============================================================
 // PRINT RECEIPT FOR ONLINE ORDER
 // ============================================================
+// ============================================================
+// PRINT RECEIPT FOR ONLINE ORDER
+// ============================================================
 async function printOnlineOrderReceipt(orderId) {
   const result = await apiCall(`/orders/${orderId}`);
 
@@ -788,31 +791,33 @@ async function printOnlineOrderReceipt(orderId) {
   let order = result.data;
   const isRefunded = order.status === "refunded" || order.is_refunded === true;
 
-  // 🆕 AUTO-COMPLETE PAG NAG-PRINT NG RECEIPT
-  if (
-    order.status !== "completed" &&
-    order.status !== "refunded" &&
-    order.status !== "cancelled"
-  ) {
+  let completedSuccessfully = false;
+  let paymentSavedSuccessfully = false;
+
+  // 🆕 STEP 1: AUTO-COMPLETE MUNA
+  if (!["completed", "cancelled", "refunded"].includes(order.status)) {
     try {
       const updateRes = await apiCall(`/orders/${order._id}/status`, {
         method: "PUT",
         body: JSON.stringify({ status: "completed" }),
       });
       if (updateRes.success) {
-        order.status = "completed"; // Update local object
+        order.status = "completed";
+        completedSuccessfully = true;
         console.log("✅ Order auto-completed");
+      } else {
+        console.error("❌ Failed to auto-complete:", updateRes.error);
       }
     } catch (err) {
-      console.error("Auto-complete error:", err);
+      console.error("❌ Auto-complete error:", err);
     }
+  } else {
+    // Kung completed na talaga from the start
+    completedSuccessfully = true;
   }
-  // 🆕 Declare refundWatermark variable
-  const refundWatermark = isRefunded
-    ? `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 40px; font-weight: bold; color: rgba(239, 68, 68, 0.3); z-index: 9999; pointer-events: none; white-space: nowrap;">REFUNDED</div>`
-    : "";
-  // 🆕 AUTO-SAVE PAYMENT AS PAID PAG NAG-PRINT NG RECEIPT
-  if (order.status === "completed" || order.status === "ready") {
+
+  // 🆕 STEP 2: AUTO-SAVE PAYMENT AS PAID
+  if (order.status === "completed") {
     try {
       const existing = await apiCall("/payments");
       const hasPayment = existing.data?.some(
@@ -820,7 +825,7 @@ async function printOnlineOrderReceipt(orderId) {
       );
 
       if (!hasPayment) {
-        await apiCall("/payments", {
+        const payRes = await apiCall("/payments", {
           method: "POST",
           body: JSON.stringify({
             order_id: order._id,
@@ -831,12 +836,41 @@ async function printOnlineOrderReceipt(orderId) {
             payment_details: {},
           }),
         });
-        console.log("✅ Payment auto-saved as Paid");
+
+        if (payRes.success) {
+          paymentSavedSuccessfully = true;
+          console.log("✅ Payment auto-saved as Paid");
+        } else {
+          console.error("❌ Failed to save payment:", payRes.error);
+        }
+      } else {
+        // Meron nang payment record
+        paymentSavedSuccessfully = true;
+        console.log("ℹ️ Payment already exists");
       }
     } catch (err) {
-      console.error("Payment save error:", err);
+      console.error("❌ Payment save error:", err);
     }
   }
+
+  // 🆕 IPAKITA ANG NOTIFICATION SA USER
+  if (order.status === "completed") {
+    if (paymentSavedSuccessfully) {
+      alert(
+        `✅ ORDER COMPLETED!\n\nNaka-save na sa Payments Record at Analytics ang ₱${order.total_amount.toFixed(2)}.`,
+      );
+    } else {
+      alert(
+        `⚠️ ORDER COMPLETED!\n\nPero nagka-problema sa pag-save ng Payment Record. Check ang Console.`,
+      );
+    }
+  }
+
+  // 🆕 Declare refundWatermark variable
+  const refundWatermark = isRefunded
+    ? `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 40px; font-weight: bold; color: rgba(239, 68, 68, 0.3); z-index: 9999; pointer-events: none; white-space: nowrap;">REFUNDED</div>`
+    : "";
+
   const itemsHtml = (order.items || [])
     .map((item) => {
       let expDateHtml = "";
@@ -877,13 +911,7 @@ async function printOnlineOrderReceipt(orderId) {
   <style>
     @page { size: 58mm auto; margin: 2mm; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      width: 54mm;
-      padding: 3mm;
-      color: #000;
-    }
+    body { font-family: 'Courier New', monospace; font-size: 11px; width: 54mm; padding: 3mm; color: #000; }
     .center { text-align: center; }
     .bold { font-weight: bold; }
     h1 { font-size: 13px; margin-bottom: 2px; }

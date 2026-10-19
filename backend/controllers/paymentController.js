@@ -32,26 +32,41 @@ exports.getPayment = async (req, res) => {
 };
 
 // ==================== CREATE payment ====================
+// ==================== CREATE payment ====================
 exports.createPayment = async (req, res) => {
   try {
     const { order_id, payment_method, amount, status, transaction_ref } =
       req.body;
 
+    // 🆕 Siguraduhing number ang amount (imbes na string)
+    const parsedAmount = Number(amount) || 0;
+
+    // 🆕 Gumawa ng payment record
     const payment = await Payment.create({
       order_id,
       payment_method,
-      amount,
+      amount: parsedAmount,
       status: status || "paid",
       transaction_ref,
     });
 
-    // Kung paid na, i-update ang order status
-    if (payment.status === "paid") {
-      await Order.findByIdAndUpdate(order_id, { status: "confirmed" });
+    // 🆕 I-update ang order status KUNG valid ObjectId at hindi pa completed
+    if (payment.status === "paid" && order_id) {
+      try {
+        // I-query muna kung existing, para hindi mag-crash pag invalid ID
+        const order = await Order.findById(order_id);
+        if (order && ["pending", "ready"].includes(order.status)) {
+          order.status = "confirmed";
+          await order.save();
+        }
+      } catch (err) {
+        console.log("Order update skipped (non-critical):", err.message);
+      }
     }
 
     res.status(201).json({ success: true, data: payment });
   } catch (error) {
+    console.error("Payment Create Error:", error); // 🆕 I-print sa terminal kung bakit nag-fail
     res.status(400).json({ success: false, error: error.message });
   }
 };
