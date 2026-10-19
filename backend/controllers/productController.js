@@ -34,6 +34,15 @@ exports.getProduct = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
+
+    // 🆕 AUTO-CREATE INVENTORY RECORD
+    const Inventory = require("../models/Inventory");
+    await Inventory.create({
+      product_id: product._id,
+      stock_quantity: product.stock_quantity || 0,
+      min_stock_level: 10,
+    });
+
     res.status(201).json({ success: true, data: product });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
