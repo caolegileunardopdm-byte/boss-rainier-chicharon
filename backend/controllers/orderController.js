@@ -62,7 +62,6 @@ exports.getOrder = async (req, res) => {
 // ==================== GET MY ORDERS (Customer's own orders) ====================
 exports.getMyOrders = async (req, res) => {
   try {
-    // Kunin ang customer ID from JWT token
     const customerId = req.query.userId || req.user?.id || req.userId;
 
     if (!customerId) {
@@ -80,7 +79,7 @@ exports.getMyOrders = async (req, res) => {
       orders.map(async (order) => {
         const items = await OrderItem.find({ order_id: order._id }).populate(
           "product_id",
-          "name price barcode image_url expiration_date", // 🆕 Idinagdag
+          "name price barcode image_url expiration_date",
         );
         return { ...order.toObject(), items };
       }),
@@ -103,7 +102,6 @@ exports.createOrder = async (req, res) => {
         .json({ success: false, error: "No items in order" });
     }
 
-    // 1. Calculate total & verify stock
     let total = 0;
     for (const item of items) {
       const product = await Product.findById(item.product_id);
@@ -122,16 +120,14 @@ exports.createOrder = async (req, res) => {
       total += product.price * item.quantity;
     }
 
-    // 2. Create order — 🆕 isama ang status (para sa auto-completed POS orders)
     const order = await Order.create({
       customer_id,
       total_amount: total,
       pickup_date,
       pickup_time,
-      status: status || "pending", // 🆕 Auto-completed kung provided
+      status: status || "pending",
     });
 
-    // 3. Create order items & reduce stock
     for (const item of items) {
       const product = await Product.findById(item.product_id);
       const subtotal = product.price * item.quantity;
@@ -145,12 +141,10 @@ exports.createOrder = async (req, res) => {
         subtotal,
       });
 
-      // Reduce stock
       product.stock_quantity -= item.quantity;
       await product.save();
     }
 
-    // 4. Return order with items
     const orderItems = await OrderItem.find({ order_id: order._id });
     res.status(201).json({
       success: true,
@@ -182,7 +176,6 @@ exports.updateOrderStatus = async (req, res) => {
       console.log(`✅ Stock returned for order ${order._id}`);
     }
 
-    // I-update ang status
     order.status = status;
     await order.save();
 
@@ -202,6 +195,7 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 // ==================== REFUND ORDER (Staff) ====================
 exports.refundOrder = async (req, res) => {
   try {
@@ -212,7 +206,6 @@ exports.refundOrder = async (req, res) => {
       return res.status(404).json({ success: false, error: "Order not found" });
     }
 
-    // Pwede i-refund kung Completed, Pending, o Confirmed pa lang
     if (!["completed", "pending", "confirmed"].includes(order.status)) {
       return res.status(400).json({
         success: false,
@@ -221,15 +214,13 @@ exports.refundOrder = async (req, res) => {
       });
     }
 
-    // 1. I-update ang status to refunded
     order.status = "refunded";
     order.refunded_at = new Date();
     order.refunded_by = staff_id || null;
-    order.refund_amount = order.total_amount; // Ibinalik lahat ng pera
+    order.refund_amount = order.total_amount;
 
     await order.save();
 
-    // 🆕 2. I-save sa Loss collection
     const Loss = require("../models/Loss");
     const orderItems = await OrderItem.find({ order_id: order._id });
 
@@ -249,6 +240,37 @@ exports.refundOrder = async (req, res) => {
     res.json({
       success: true,
       message: "Order refunded and recorded as loss",
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// ==================== REQUEST CANCEL ORDER (Customer) ====================
+exports.requestCancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    // Pwede mag-request ng cancel kung pending, confirmed, o ready pa lang
+    if (!["pending", "confirmed", "ready"].includes(order.status)) {
+      return res.status(400).json({
+        success: false,
+        error: "Hindi na pwedeng i-cancel ang order na ito.",
+      });
+    }
+
+    // Gawing "cancel_requested" ang status para makita ni Admin
+    order.status = "cancel_requested";
+    await order.save();
+
+    res.json({
+      success: true,
+      message: "Cancel request sent to admin.",
       data: order,
     });
   } catch (error) {

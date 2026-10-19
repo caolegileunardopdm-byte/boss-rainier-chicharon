@@ -7,7 +7,8 @@ const {
   createOrder,
   updateOrderStatus,
   deleteOrder,
-  refundOrder, // 🆕 Idinagdag natin ito
+  refundOrder,
+  requestCancelOrder, // 🆕 Idinagdag
 } = require("../controllers/orderController");
 
 router.get("/", getOrders);
@@ -15,7 +16,8 @@ router.get("/my-orders", getMyOrders);
 router.get("/:id", getOrder);
 router.post("/", createOrder);
 router.put("/:id/status", updateOrderStatus);
-router.put("/:id/refund", refundOrder); // 🆕 ROUTE PARA SA REFUND
+router.put("/:id/cancel-request", requestCancelOrder); // 🆕 BAGONG ROUTE
+router.put("/:id/refund", refundOrder);
 router.delete("/:id", deleteOrder);
 
 module.exports = router;
