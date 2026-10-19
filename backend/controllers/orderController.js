@@ -41,6 +41,17 @@ exports.getOrder = async (req, res) => {
       "product_id",
       "name price barcode image_url expiration_date",
     );
+    // 🆕 I-check kung refunded na (para sa resibo)
+    if (order.status === "refunded") {
+      return res.json({
+        success: true,
+        data: {
+          ...order.toObject(),
+          items,
+          is_refunded: true, // 🆕 Flag para sa resibo
+        },
+      });
+    }
 
     res.json({ success: true, data: { ...order.toObject(), items } });
   } catch (error) {

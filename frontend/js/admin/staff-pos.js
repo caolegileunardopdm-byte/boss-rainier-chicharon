@@ -786,6 +786,11 @@ async function printOnlineOrderReceipt(orderId) {
   }
 
   const order = result.data;
+  const isRefunded = order.status === "refunded" || order.is_refunded === true;
+  // 🆕 Declare refundWatermark variable
+  const refundWatermark = isRefunded
+    ? `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 40px; font-weight: bold; color: rgba(239, 68, 68, 0.3); z-index: 9999; pointer-events: none; white-space: nowrap;">REFUNDED</div>`
+    : "";
   // 🆕 AUTO-SAVE PAYMENT AS PAID PAG NAG-PRINT NG RECEIPT
   if (order.status === "completed" || order.status === "ready") {
     try {
@@ -876,6 +881,7 @@ async function printOnlineOrderReceipt(orderId) {
   </style>
 </head>
 <body>
+   ${refundWatermark}
   <div class="center">
     <h1>CRISPY CHICHARON</h1>
     <div class="subtitle">Signature Chicharon</div>
@@ -911,6 +917,21 @@ async function printOnlineOrderReceipt(orderId) {
     <div class="info-row"><span>Pickup Date:</span><span>${order.pickup_date ? new Date(order.pickup_date).toLocaleDateString("en-PH") : "N/A"}</span></div>
     <div class="info-row"><span>Pickup Time:</span><span>${order.pickup_time || "N/A"}</span></div>
   </div>
+    ${
+      isRefunded
+        ? `
+    <div class="divider-solid"></div>
+    <div class="center" style="margin-top: 10px;">
+      <div style="font-size: 14px; font-weight: bold; color: #dc2626; padding: 8px; border: 2px solid #dc2626; border-radius: 4px;">
+        ❌ REFUNDED
+      </div>
+      <div style="font-size: 9px; color: #6b7280; margin-top: 4px;">
+        Ang resibong ito ay na-refund na.
+      </div>
+    </div>
+  `
+        : ""
+    }
   <div class="divider-solid"></div>
   <div class="center thank-you">
     <div class="bold">Salamat sa pagtangkilik!</div>
