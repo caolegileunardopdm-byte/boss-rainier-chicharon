@@ -161,11 +161,12 @@ function renderTimeline(status) {
   ];
 
   // 🆕 KUNG NAG-REQUEST NG CANCEL
-  if (status === "cancel_requested") {
+  if (status === "refund_requested") {
+    // 🆕 Pinalitan
     return `
       <div class="timeline-step cancelled" style="width: 100%;">
         <div class="timeline-dot">⏳</div>
-        <div class="timeline-label">Wait Admin Respond</div>
+        <div class="timeline-label">Wait Admin Respond (Refund)</div>
       </div>
     `;
   }
@@ -215,12 +216,14 @@ let pendingCancelOrderId = null;
 
 function confirmCancelOrder(orderId, orderIdShort) {
   pendingCancelOrderId = orderId;
-  document.getElementById("confirm-title").textContent = "Cancel Order?";
-  document.getElementById("confirm-message").innerHTML = `
-    Sigurado ka bang gusto mong i-cancel ang <strong>Order #${orderIdShort}</strong>?<br>
-    <span style="color: var(--danger); font-size: 0.85rem;">Ipapadala ito sa admin para i-approve.</span>
-  `;
 
+  // 🆕 Eksaktong text lang na gusto mo
+  document.getElementById("confirm-title").textContent =
+    `Are you sure you want to cancel Order #${orderIdShort}?`;
+  document.getElementById("confirm-message").innerHTML = ""; // Binura ang sobrang text
+  document.getElementById("confirm-ok-btn").textContent = "Yes"; // Pinalitan ang button text
+
+  // 🆕 Logic kapag pinindot ang "Yes"
   document.getElementById("confirm-ok-btn").onclick = () => {
     closeConfirmModal();
     doCancelOrder();

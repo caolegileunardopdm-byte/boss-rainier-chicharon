@@ -265,7 +265,7 @@ exports.requestCancelOrder = async (req, res) => {
     }
 
     // Gawing "cancel_requested" ang status para makita ni Admin
-    order.status = "cancel_requested";
+    order.status = "refund_requested"; // 🆕 Ito ang lalabas sa admin
     await order.save();
 
     res.json({

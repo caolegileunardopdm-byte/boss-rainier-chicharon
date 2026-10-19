@@ -94,9 +94,10 @@ function getStatusButtons(order) {
   const id = order._id;
 
   // 🆕 PARA SA CANCEL REQUEST (Galing kay Customer)
-  if (status === "cancel_requested") {
+  if (status === "refund_requested") {
+    // 🆕 Pinalitan
     return `
-      <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')" style="background: var(--danger, #ef4444); color: white;">Approve Cancel</button>
+      <button class="btn-sm btn-cancel" onclick="updateStatus('${id}', 'cancelled')" style="background: var(--danger, #ef4444); color: white;">Approve Refund</button>
       <button class="btn-sm btn-view" onclick="updateStatus('${id}', 'pending')">Reject</button>
     `;
   }
