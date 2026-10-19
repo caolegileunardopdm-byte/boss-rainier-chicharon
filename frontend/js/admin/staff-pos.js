@@ -785,8 +785,28 @@ async function printOnlineOrderReceipt(orderId) {
     return;
   }
 
-  const order = result.data;
+  let order = result.data;
   const isRefunded = order.status === "refunded" || order.is_refunded === true;
+
+  // 🆕 AUTO-COMPLETE PAG NAG-PRINT NG RECEIPT
+  if (
+    order.status !== "completed" &&
+    order.status !== "refunded" &&
+    order.status !== "cancelled"
+  ) {
+    try {
+      const updateRes = await apiCall(`/orders/${order._id}/status`, {
+        method: "PUT",
+        body: JSON.stringify({ status: "completed" }),
+      });
+      if (updateRes.success) {
+        order.status = "completed"; // Update local object
+        console.log("✅ Order auto-completed");
+      }
+    } catch (err) {
+      console.error("Auto-complete error:", err);
+    }
+  }
   // 🆕 Declare refundWatermark variable
   const refundWatermark = isRefunded
     ? `<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 40px; font-weight: bold; color: rgba(239, 68, 68, 0.3); z-index: 9999; pointer-events: none; white-space: nowrap;">REFUNDED</div>`
