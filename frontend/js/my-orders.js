@@ -217,13 +217,14 @@ let pendingCancelOrderId = null;
 function confirmCancelOrder(orderId, orderIdShort) {
   pendingCancelOrderId = orderId;
 
-  // 🆕 Eksaktong text lang na gusto mo
+  // Exact text na gusto mo
   document.getElementById("confirm-title").textContent =
-    `Are you sure you want to cancel Order #${orderIdShort}?`;
-  document.getElementById("confirm-message").innerHTML = ""; // Binura ang sobrang text
-  document.getElementById("confirm-ok-btn").textContent = "Yes"; // Pinalitan ang button text
+    `Cancel Order #${orderIdShort}?`;
+  document.getElementById("confirm-message").innerHTML = `
+    <p style="font-weight: bold; font-size: 1.1rem; color: #333;">Are you sure you want to cancel Order #${orderIdShort}?</p>
+    <p style="font-size: 0.9rem; margin-top: 0.5rem;">The admin will review your request.</p>
+  `;
 
-  // 🆕 Logic kapag pinindot ang "Yes"
   document.getElementById("confirm-ok-btn").onclick = () => {
     closeConfirmModal();
     doCancelOrder();
@@ -241,7 +242,6 @@ function closeConfirmModal() {
 async function doCancelOrder() {
   if (!pendingCancelOrderId) return;
 
-  // Tatawagin ang bagong route na ginawa natin
   const result = await apiCall(
     `/orders/${pendingCancelOrderId}/cancel-request`,
     {
@@ -255,5 +255,5 @@ async function doCancelOrder() {
   }
 
   alert("✅ Request sent! Wait for admin to respond.");
-  loadMyOrders(); // I-refresh ang listahan para lumabas ang "Wait Admin Respond"
+  loadMyOrders();
 }

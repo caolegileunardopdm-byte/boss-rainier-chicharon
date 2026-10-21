@@ -19,9 +19,6 @@
       property="og:image"
       content="https://boss-rainier-chicharon-frontend.vercel.app/assets/preview.png"
     />
-    <meta property="og:image:width" content="1920" />
-    <meta property="og:image:height" content="1080" />
-    <meta property="og:image:type" content="image/png" />
     <meta
       property="og:url"
       content="https://boss-rainier-chicharon-frontend.vercel.app/"
@@ -33,10 +30,6 @@
     <meta
       name="twitter:title"
       content="Crispy Chicharon - Signature Chicharon"
-    />
-    <meta
-      name="twitter:description"
-      content="Signature chicharon ni Mrs. Marissa Del Rosario. Order online for pick-up!"
     />
     <meta
       name="twitter:image"
@@ -74,7 +67,13 @@
           </p>
           <p class="card-tagline">Crispy • Crunchy • Masarap</p>
           <div class="hero-buttons">
-            <a href="products.html" class="btn btn-primary">🛒 Shop Now</a>
+            <!-- 🆕 DITO NILAGAY ANG ONCLICK -->
+            <a
+              href="products.html"
+              onclick="handleCheckoutClick(event)"
+              class="btn btn-primary"
+              >🛒 Shop Now</a
+            >
             <a href="#location" class="btn btn-secondary">📍 View Location</a>
           </div>
         </div>
@@ -242,7 +241,13 @@
           Pre-order na ngayon at i-pick up sa araw na convenient para sa iyo!
         </p>
         <h1>
-          <a href="products.html" class="btn btn-primary">Start Ordering</a>
+          <!-- 🆕 DITO NILAGAY ANG ONCLICK -->
+          <a
+            href="products.html"
+            onclick="handleCheckoutClick(event)"
+            class="btn btn-primary"
+            >Start Ordering</a
+          >
         </h1>
       </section>
     </main>
@@ -273,16 +278,40 @@
       </div>
     </footer>
 
+    <!-- 🆕 SCRIPT NA MAY LOGIC PARA SA LOGIN CHECK -->
     <script src="js/config.js"></script>
     <script>
-      document.getElementById("cart-count").textContent = getCartCount();
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("cart-count").textContent = getCartCount();
+        const user = getCurrentUser();
 
-      const user = getCurrentUser();
-      if (user) {
-        document.getElementById("auth-links").innerHTML = `
-          <span style="color: white;">Hi, ${user.full_name}!</span>
-          <a href="#" onclick="logout(); return false;">Logout</a>
-        `;
+        if (user) {
+          document.getElementById("auth-links").innerHTML = `
+            <span style="color: white;">Hi, ${user.full_name}!</span>
+            <a href="#" onclick="logout(); return false;">Logout</a>
+          `;
+          const myOrdersNav = document.getElementById("my-orders-nav");
+          if (myOrdersNav) myOrdersNav.style.display = "block";
+        }
+      });
+
+      // 🆕 ITO ANG FUNCTION NA MAGCHECHECK KUNG NAKA-LOGIN
+      function handleCheckoutClick(event) {
+        event.preventDefault(); // Pipigilan muna ang pagpunta sa products
+
+        const user = getCurrentUser();
+
+        if (!user) {
+          if (
+            confirm(
+              "You need to log in first to shop!\n\nDo you want to proceed to the login page?",
+            )
+          ) {
+            window.location.href = "login.html";
+          }
+        } else {
+          window.location.href = "products.html";
+        }
       }
 
       async function loadProducts() {
@@ -301,12 +330,7 @@
             ${
               product.image_url
                 ? `<div class="product-image-wrapper">
-                    <img 
-                      src="${product.image_url}" 
-                      alt="${product.name}" 
-                      class="product-image" 
-                      onerror="this.style.display='none'" 
-                    />
+                    <img src="${product.image_url}" alt="${product.name}" class="product-image" onerror="this.style.display='none'" />
                   </div>`
                 : ""
             }
@@ -318,7 +342,7 @@
                 ${product.stock_quantity > 0 ? `Stock: ${product.stock_quantity}` : "Out of Stock"}
               </span>
             </div>
-            <a href="products.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem; display: block;">
+            <a href="products.html" onclick="handleCheckoutClick(event)" class="btn btn-primary" style="width: 100%; margin-top: 1rem; display: block;">
               Order Now
             </a>
           </div>
