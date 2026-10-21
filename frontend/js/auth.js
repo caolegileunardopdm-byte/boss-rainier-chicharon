@@ -121,7 +121,7 @@ async function handleRegister(e) {
   const address = document.getElementById("reg-address").value.trim();
 
   // 🆕 Idinagdag ang phone at address para required talaga lahat
-  if (!full_name || !email || !username || !password || !phone || !address) {
+  if (!full_name || !email || !password || !phone || !address) {
     showAlert(
       "Please fill in all required fields, including Phone and Address.",
       "danger",

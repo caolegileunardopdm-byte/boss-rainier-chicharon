@@ -41,15 +41,16 @@ function isAdmin() {
 }
 
 function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-  localStorage.removeItem("cart");
+  if (confirm("Are you sure you want to log out?")) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("cart");
 
-  // Get the base path (works for both root and admin folder)
-  const path = window.location.pathname;
-  const basePath = path.includes("/admin/") ? "../" : "";
+    const path = window.location.pathname;
+    const basePath = path.includes("/admin/") ? "../" : "";
 
-  window.location.href = basePath + "login.html";
+    window.location.href = basePath + "login.html";
+  }
 }
 
 // ==================== CART HELPERS ====================

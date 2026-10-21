@@ -61,7 +61,6 @@ function renderUsers() {
       <td><small style="color: var(--text-light);">${formatDate(u.createdAt)}</small></td>
       <td>
         <div class="action-btns">
-          <button class="btn-sm btn-edit" onclick="openEditModal('${u._id}')">Edit</button>
           <button class="btn-sm btn-delete" onclick="deleteUser('${u._id}', '${u.full_name.replace(/'/g, "\\'")}')">Delete</button>
         </div>
       </td>
