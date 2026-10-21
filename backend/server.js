@@ -1,3 +1,7 @@
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first"); // 🆕 Mas malakas na fix kaysa sa setServers
+dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]); // 🆕 Dinagdagan ng Cloudflare DNS
+
 require("dotenv").config({ path: "../.env" });
 const express = require("express");
 const mongoose = require("mongoose");
@@ -47,7 +51,6 @@ app.use((req, res) => {
 // ==================== ERROR HANDLER ====================
 app.use((err, req, res, next) => {
   console.error("Server error:", err.message);
-
   res.status(500).json({
     success: false,
     error: "Internal server error",
@@ -63,17 +66,21 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
+// 🆕 DINAGDAGAN NATIN NG MGA OPTIONS PARA MA-BYPASS ANG DNS ERROR
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, {
+    family: 4, // Pilitin ang IPv4
+    serverSelectionTimeoutMS: 10000, // Bigyan ng 10 seconds bago mag-timeout
+    socketTimeoutMS: 45000,
+  })
   .then(() => {
-    console.log("Connected to MongoDB Atlas");
-
+    console.log("✅ Connected to MongoDB Atlas");
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server listening on port ${PORT}`);
-      console.log("Crispy Chicharon API is ready");
+      console.log(`✅ Server listening on port ${PORT}`);
+      console.log("✅ Crispy Chicharon API is ready");
     });
   })
   .catch((error) => {
-    console.error("MongoDB connection error:", error.message);
+    console.error("❌ MongoDB connection error:", error.message);
     process.exit(1);
   });
