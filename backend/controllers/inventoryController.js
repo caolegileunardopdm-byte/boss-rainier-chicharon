@@ -4,10 +4,17 @@ const Product = require("../models/Product");
 // ==================== GET all inventory ====================
 exports.getInventory = async (req, res) => {
   try {
-    const inventory = await Inventory.find()
-      .populate("product_id", "name price barcode stock_quantity")
-      .sort({ createdAt: -1 });
-    res.json({ success: true, data: inventory });
+    const inventories = await Inventory.find().populate(
+      "product_id",
+      "name barcode",
+    );
+
+    // I-filter out ang mga record na walang katumbas na product (Unknown)
+    const validInventories = inventories.filter(
+      (inv) => inv.product_id !== null,
+    );
+
+    res.json({ success: true, data: validInventories });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -18,12 +25,12 @@ exports.getInventoryItem = async (req, res) => {
   try {
     const inventory = await Inventory.findById(req.params.id).populate(
       "product_id",
-      "name price barcode",
+      "name barcode",
     );
     if (!inventory) {
       return res
         .status(404)
-        .json({ success: false, error: "Inventory not found" });
+        .json({ success: false, error: "Inventory record not found" });
     }
     res.json({ success: true, data: inventory });
   } catch (error) {
@@ -31,28 +38,29 @@ exports.getInventoryItem = async (req, res) => {
   }
 };
 
-// ==================== CREATE or UPDATE inventory ====================
+// ==================== UPSERT INVENTORY (Create or Update) ====================
 exports.upsertInventory = async (req, res) => {
   try {
     const { product_id, stock_quantity, min_stock_level } = req.body;
 
+    // Hanapin kung existing na ang inventory para sa product na ito
     let inventory = await Inventory.findOne({ product_id });
+
     if (inventory) {
+      // Update kung meron na
       inventory.stock_quantity = stock_quantity;
-      if (min_stock_level !== undefined) {
-        inventory.min_stock_level = min_stock_level;
-      }
-      inventory.last_updated = Date.now();
+      inventory.min_stock_level = min_stock_level || inventory.min_stock_level;
       await inventory.save();
     } else {
+      // Gumawa ng bago kung wala pa
       inventory = await Inventory.create({
         product_id,
-        stock_quantity,
-        min_stock_level,
+        stock_quantity: stock_quantity || 0,
+        min_stock_level: min_stock_level || 10,
       });
     }
 
-    // Sync sa Product model
+    // I-sync din sa Product model
     await Product.findByIdAndUpdate(product_id, { stock_quantity });
 
     res.json({ success: true, data: inventory });
@@ -61,23 +69,35 @@ exports.upsertInventory = async (req, res) => {
   }
 };
 
-// ==================== GET low stock items ====================
-exports.getLowStock = async (req, res) => {
+// ==================== DELETE INVENTORY ====================
+exports.deleteInventory = async (req, res) => {
   try {
-    const lowStock = await Inventory.find({
-      $expr: { $lte: ["$stock_quantity", "$min_stock_level"] },
-    }).populate("product_id", "name barcode price");
-    res.json({ success: true, data: lowStock });
+    const inventory = await Inventory.findByIdAndDelete(req.params.id);
+    if (!inventory) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Inventory record not found" });
+    }
+    res.json({ success: true, message: "Inventory record deleted" });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// ==================== DELETE inventory ====================
-exports.deleteInventory = async (req, res) => {
+// ==================== GET low stock alerts ====================
+exports.getLowStock = async (req, res) => {
   try {
-    await Inventory.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "Inventory deleted" });
+    const inventories = await Inventory.find().populate(
+      "product_id",
+      "name barcode",
+    );
+
+    const lowStock = inventories.filter(
+      (inv) =>
+        inv.product_id !== null && inv.stock_quantity <= inv.min_stock_level,
+    );
+
+    res.json({ success: true, data: lowStock });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

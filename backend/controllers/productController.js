@@ -1,122 +1,91 @@
+const Inventory = require("../models/Inventory");
 const Product = require("../models/Product");
 
-// GET all products
-exports.getProducts = async (req, res) => {
+// GET all inventory
+exports.getInventory = async (req, res) => {
   try {
-    const products = await Product.find()
-      .populate("category_id", "name description")
-      .sort({ createdAt: -1 });
-    res.json({ success: true, data: products });
+    const inventories = await Inventory.find().populate(
+      "product_id",
+      "name barcode",
+    );
+    res.json({ success: true, data: inventories });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// GET single product
-exports.getProduct = async (req, res) => {
+// GET single inventory
+exports.getInventoryItem = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      "category_id",
-      "name description",
+    const inventory = await Inventory.findById(req.params.id).populate(
+      "product_id",
+      "name barcode",
     );
-    if (!product) {
+    if (!inventory) {
       return res
         .status(404)
-        .json({ success: false, error: "Product not found" });
+        .json({ success: false, error: "Inventory record not found" });
     }
-    res.json({ success: true, data: product });
+    res.json({ success: true, data: inventory });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// CREATE product
-exports.createProduct = async (req, res) => {
+// UPSERT INVENTORY (Create or Update)
+exports.upsertInventory = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const { product_id, stock_quantity, min_stock_level } = req.body;
 
-    // 🆕 AUTO-CREATE INVENTORY RECORD
-    const Inventory = require("../models/Inventory");
-    await Inventory.create({
-      product_id: product._id,
-      stock_quantity: product.stock_quantity || 0,
-      min_stock_level: 10,
-    });
+    let inventory = await Inventory.findOne({ product_id });
 
-    res.status(201).json({ success: true, data: product });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-};
-
-// UPDATE product
-exports.updateProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Product not found" });
-    }
-    res.json({ success: true, data: product });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-};
-
-// DELETE product
-exports.deleteProduct = async (req, res) => {
-  try {
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "Product deleted" });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-// ==================== GET PRODUCT BY BARCODE ====================
-// Para sa QR/Barcode scanner
-exports.getProductByBarcode = async (req, res) => {
-  try {
-    const code = req.params.code;
-
-    // Hanapin ang product sa barcode
-    const product = await Product.findOne({ barcode: code }).populate(
-      "category_id",
-      "name description",
-    );
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        error: "Product not found for barcode: " + code,
+    if (inventory) {
+      inventory.stock_quantity = stock_quantity;
+      inventory.min_stock_level = min_stock_level || inventory.min_stock_level;
+      await inventory.save();
+    } else {
+      inventory = await Inventory.create({
+        product_id,
+        stock_quantity: stock_quantity || 0,
+        min_stock_level: min_stock_level || 10,
       });
     }
 
-    // Hanapin ang last order ng product
-    const OrderItem = require("../models/OrderItem");
+    res.json({ success: true, data: inventory });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+};
 
-    const lastOrderItem = await OrderItem.findOne({ product_id: product._id })
-      .sort({ createdAt: -1 })
-      .populate("order_id", "order_date status pickup_date pickup_time");
+// DELETE INVENTORY
+exports.deleteInventory = async (req, res) => {
+  try {
+    const inventory = await Inventory.findByIdAndDelete(req.params.id);
+    if (!inventory) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Inventory record not found" });
+    }
+    res.json({ success: true, message: "Inventory record deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
-    const lastOrdered = lastOrderItem?.order_id?.order_date || null;
+// GET low stock alerts
+exports.getLowStock = async (req, res) => {
+  try {
+    const inventories = await Inventory.find().populate(
+      "product_id",
+      "name barcode",
+    );
 
-    // 🆕 Kunin ang last sold data
-    const lastSold = lastOrderItem?.createdAt || null;
-    const lastSoldQty = lastOrderItem?.quantity || 0;
+    const lowStock = inventories.filter(
+      (inv) =>
+        inv.product_id !== null && inv.stock_quantity <= inv.min_stock_level,
+    );
 
-    res.json({
-      success: true,
-      data: {
-        ...product.toObject(),
-        last_ordered: lastOrdered,
-        last_sold: lastSold,
-        last_sold_quantity: lastSoldQty,
-      },
-    });
+    res.json({ success: true, data: lowStock });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
