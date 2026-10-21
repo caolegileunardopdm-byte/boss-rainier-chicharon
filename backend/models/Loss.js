@@ -1,34 +1,35 @@
 const mongoose = require("mongoose");
 
-const LossSchema = new mongoose.Schema(
+const lossSchema = new mongoose.Schema(
   {
+    // 🆕 Ginawang optional para pwede sa deleted products na walang order
     order_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Order",
-      required: true,
+      required: false,
     },
     product_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-      required: true,
     },
-    product_name: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    unit_price: { type: Number, required: true },
-    total_loss: { type: Number, required: true },
+    product_name: String,
+    quantity: Number,
+    unit_price: Number,
+    total_loss: Number,
+
+    // 🆕 Idinagdag ang "deleted" sa listahan ng valid reasons
     reason: {
       type: String,
-      enum: ["refund", "expired", "damaged"],
-      default: "refund",
+      enum: ["expired", "damaged", "refund", "deleted"],
+      required: true,
     },
     refunded_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      default: null,
+      required: false,
     },
-    date: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );
 
-module.exports = mongoose.model("Loss", LossSchema);
+module.exports = mongoose.model("Loss", lossSchema);

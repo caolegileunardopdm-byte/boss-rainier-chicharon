@@ -1,6 +1,9 @@
 // ==================== API CONFIGURATION ====================
-const API_BASE_URL = "https://boss-rainier-chicharon.onrender.com/api";
-
+const API_BASE_URL =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1"
+    ? "http://localhost:5000/api" // Local backend
+    : "https://boss-rainier-chicharon.onrender.com/api"; // Render backend
 // ==================== API HELPER ====================
 async function apiCall(endpoint, options = {}) {
   const token = localStorage.getItem("token");

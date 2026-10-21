@@ -100,6 +100,8 @@ exports.deleteProduct = async (req, res) => {
       message: "Product deleted and moved to lost products.",
     });
   } catch (error) {
+    // 🆕 I-print ang totoong error sa terminal para makita natin
+    console.error("DELETE PRODUCT ERROR:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
