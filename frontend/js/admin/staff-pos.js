@@ -109,16 +109,30 @@ function renderProducts(products) {
   }
 
   grid.innerHTML = products
-    .map(
-      (p) => `
-    <div class="product-card" onclick="addToCartById('${p._id}')">
-      <div class="name">${p.name}</div>
-      <div class="barcode">${p.barcode || "—"}</div>
-      <div class="price">₱${Number(p.price).toFixed(2)}</div>
-      <div class="stock">Stock: ${p.stock_quantity ?? 0}</div>
+    .map((p) => {
+      const isOutOfStock = (p.stock_quantity || 0) <= 0;
+
+      // Kung sold out, walang onclick at may special style
+      const clickAction = isOutOfStock
+        ? ""
+        : `onclick="addToCartById('${p._id}')"`;
+      const cardStyle = isOutOfStock
+        ? "opacity: 0.6; cursor: not-allowed; position: relative; background: #f9fafb;"
+        : "";
+
+      return `
+    <div class="product-card" ${clickAction} style="${cardStyle}">
+      ${isOutOfStock ? `<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); color: #dc2626; font-size: 1.2rem; font-weight: bold; border: 2px solid #dc2626; padding: 0.3rem 0.8rem; border-radius: 6px; background: rgba(255,255,255,0.9); z-index: 10;">SOLD OUT</div>` : ""}
+      
+      <div class="name" style="${isOutOfStock ? "color: #9ca3af;" : ""}">${p.name}</div>
+      <div class="barcode" style="${isOutOfStock ? "color: #9ca3af;" : ""}">${p.barcode || "—"}</div>
+      <div class="price" style="${isOutOfStock ? "color: #9ca3af;" : ""}">₱${Number(p.price).toFixed(2)}</div>
+      <div class="stock" style="color: ${isOutOfStock ? "#dc2626" : "inherit"}; font-weight: ${isOutOfStock ? "bold" : "normal"};">
+        ${isOutOfStock ? "Out of Stock" : `Stock: ${p.stock_quantity}`}
+      </div>
     </div>
-  `,
-    )
+  `;
+    })
     .join("");
 }
 
@@ -181,9 +195,22 @@ function addToCartById(productId) {
 }
 
 function addProductToCart(product) {
+  // 🆕 Check kung out of stock
+  if ((product.stock_quantity || 0) <= 0) {
+    alert(`⚠️ SOLD OUT!\n\nWalang stock ang ${product.name}.`);
+    return;
+  }
+
   const existing = cart.find((item) => item.product_id === product._id);
 
   if (existing) {
+    // 🆕 Check kung lalampas na sa available stock
+    if (existing.quantity + 1 > product.stock_quantity) {
+      alert(
+        `⚠️ Hindi na pwedeng magdagdag!\n\nKulang na ang stock ng ${product.name}. Available: ${product.stock_quantity}`,
+      );
+      return;
+    }
     existing.quantity += 1;
     existing.subtotal = existing.quantity * existing.unit_price;
   } else {
@@ -199,7 +226,6 @@ function addProductToCart(product) {
 
   saveAndRenderCart();
 }
-
 // ============================================================
 // CART OPERATIONS
 // ============================================================
@@ -247,6 +273,17 @@ function renderCart() {
 function updateQuantity(productId, delta) {
   const item = cart.find((i) => i.product_id === productId);
   if (!item) return;
+
+  // 🆕 Check kung lalampas na sa stock kapag nag-plus
+  if (delta > 0) {
+    const product = allProducts.find((p) => p._id === productId);
+    if (product && item.quantity + 1 > product.stock_quantity) {
+      alert(
+        `⚠️ Hindi na pwedeng magdagdag!\n\nKulang na ang stock ng ${product.name}. Available: ${product.stock_quantity}`,
+      );
+      return;
+    }
+  }
 
   item.quantity += delta;
   item.subtotal = item.quantity * item.unit_price;
