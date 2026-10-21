@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
     handlePaymentChange();
   }
 });
+
 // ==================== UPDATE CART COUNT ====================
 function updateCartCount() {
   const count = getCartCount();
@@ -131,7 +132,19 @@ function handlePaymentChange() {
 }
 
 // ==================== PLACE ORDER ====================
+
 async function placeOrder() {
+  // 🆕 1. CHECK KUNG MAY NAPILING PAYMENT METHOD
+  const paymentMethod = document.getElementById("payment-method").value;
+
+  if (!paymentMethod) {
+    showAlert(
+      "Please select a payment method before placing your order.",
+      "danger",
+    );
+    return; // Pipigilan niya ang order
+  }
+
   const user = getCurrentUser();
   if (!user) {
     showAlert("Please login first.", "danger");
@@ -146,7 +159,6 @@ async function placeOrder() {
 
   const pickupDate = document.getElementById("pickup-date").value;
   const pickupTime = document.getElementById("pickup-time").value;
-  const paymentMethod = document.getElementById("payment-method").value;
 
   // Validate pick-up details
   if (!pickupDate || !pickupTime) {
