@@ -68,7 +68,7 @@
               <input
                 type="email"
                 id="login-email"
-                placeholder="juan@example.com"
+                placeholder="Enter your email (e.g., juan@example.com)"
                 required
               />
             </div>
@@ -126,9 +126,8 @@
                 switchTab('register');
                 return false;
               "
+              >Register here</a
             >
-              Register here
-            </a>
           </p>
         </div>
 
@@ -136,55 +135,58 @@
         <div id="register-panel" class="auth-panel">
           <h1>Create Account</h1>
           <p class="auth-subtitle">Sign up to start ordering</p>
+
           <form id="register-form">
+            <!-- FULL NAME -->
             <div class="form-group">
-              <label for="reg-fullname">
-                Full Name <span class="required">*</span>
-              </label>
+              <label for="reg-fullname"
+                >Full Name <span class="required">*</span></label
+              >
               <input
                 type="text"
                 id="reg-fullname"
-                placeholder="Juan Dela Cruz"
+                placeholder="Enter your full name"
                 required
               />
             </div>
 
+            <!-- EMAIL & USERNAME -->
             <div class="form-row">
               <div class="form-group">
-                <label for="reg-email">
-                  Email <span class="required">*</span>
-                </label>
+                <label for="reg-email"
+                  >Email <span class="required">*</span></label
+                >
                 <input
                   type="email"
                   id="reg-email"
-                  placeholder="juan@example.com"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
-
               <div class="form-group">
-                <label for="reg-username">
-                  Username <span class="required">*</span>
-                </label>
+                <label for="reg-username"
+                  >Username <span class="required">*</span></label
+                >
                 <input
                   type="text"
                   id="reg-username"
-                  placeholder="juandc"
+                  placeholder="Enter your username"
                   required
                 />
               </div>
             </div>
 
+            <!-- PASSWORD & PHONE -->
             <div class="form-row">
               <div class="form-group">
-                <label for="reg-password">
-                  Password <span class="required">*</span>
-                </label>
+                <label for="reg-password"
+                  >Password <span class="required">*</span></label
+                >
                 <div class="password-wrapper">
                   <input
                     type="password"
                     id="reg-password"
-                    placeholder="Min 6 characters"
+                    placeholder="Enter password"
                     required
                   />
                   <button
@@ -197,20 +199,50 @@
                   </button>
                 </div>
               </div>
-
               <div class="form-group">
-                <label for="reg-phone">Phone</label>
-                <input type="text" id="reg-phone" placeholder="09171234567" />
+                <!-- 🆕 Nilagyan ng required at asterisk -->
+                <label for="reg-phone"
+                  >Phone <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  id="reg-phone"
+                  placeholder="Enter phone number (e.g., 09171234567)"
+                  required
+                />
               </div>
             </div>
 
+            <!-- ADDRESS (SEARCHABLE DROPDOWN) -->
             <div class="form-group">
-              <label for="reg-address">Address</label>
-              <textarea
+              <!-- 🆕 Nilagyan ng required at asterisk -->
+              <label for="reg-address"
+                >Address <span class="required">*</span></label
+              >
+              <input
+                type="text"
                 id="reg-address"
-                rows="2"
-                placeholder="Marilao, Bulacan"
-              ></textarea>
+                list="address-list"
+                placeholder="Search or enter your address"
+                required
+              />
+              <datalist id="address-list">
+                <option value="Patubig, Marilao, Bulacan"></option>
+                <option value="Poblacion, Marilao, Bulacan"></option>
+                <option value="Lias, Marilao, Bulacan"></option>
+                <option value="Abangan Sur, Marilao, Bulacan"></option>
+                <option value="Abangan Norte, Marilao, Bulacan"></option>
+                <option value="Bancal, Marilao, Bulacan"></option>
+                <option value="Lambakin, Marilao, Bulacan"></option>
+                <option value="Nagbalon, Marilao, Bulacan"></option>
+                <option value="Prenza I, Marilao, Bulacan"></option>
+                <option value="Prenza II, Marilao, Bulacan"></option>
+                <option value="Sta. Rosa I, Marilao, Bulacan"></option>
+                <option value="Sta. Rosa II, Marilao, Bulacan"></option>
+                <option value="Tabing Ilog, Marilao, Bulacan"></option>
+                <option value="Ibayo, Marilao, Bulacan"></option>
+                <option value="Saog, Marilao, Bulacan"></option>
+              </datalist>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">
@@ -226,9 +258,8 @@
                 switchTab('login');
                 return false;
               "
+              >Login here</a
             >
-              Login here
-            </a>
           </p>
         </div>
       </div>

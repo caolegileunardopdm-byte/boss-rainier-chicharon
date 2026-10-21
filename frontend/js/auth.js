@@ -23,18 +23,15 @@ function switchTab(tab) {
   const navbarLink = document.getElementById("navbar-auth-link");
   if (navbarLink) {
     if (tab === "login") {
-      // If on Login tab, show "Register" link
       navbarLink.innerHTML = `
         <a href="#" onclick="switchTab('register'); return false;">Register</a>
       `;
     } else {
-      // If on Register tab, show "Login" link
       navbarLink.innerHTML = `
         <a href="#" onclick="switchTab('login'); return false;">Login</a>
       `;
     }
   }
-  // ============================================================
 
   // Update URL hash
   window.location.hash = tab;
@@ -42,7 +39,6 @@ function switchTab(tab) {
 
 // ==================== INITIALIZE ====================
 document.addEventListener("DOMContentLoaded", () => {
-  // Check if there's a hash in URL (#register or #login)
   const hash = window.location.hash.replace("#", "");
   if (hash === "register") {
     switchTab("register");
@@ -50,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     switchTab("login");
   }
 
-  // Attach form handlers
   const loginForm = document.getElementById("login-form");
   const registerForm = document.getElementById("register-form");
 
@@ -62,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
     registerForm.addEventListener("submit", handleRegister);
   }
 
-  // Update cart count
   const cartCountEl = document.getElementById("cart-count");
   if (cartCountEl) {
     cartCountEl.textContent = getCartCount();
@@ -98,13 +92,11 @@ async function handleLogin(e) {
     return;
   }
 
-  // Save token and user to localStorage
   localStorage.setItem("token", result.data.token);
   localStorage.setItem("user", JSON.stringify(result.data.user));
 
   showAlert("Login successful! Redirecting...", "success");
 
-  // Redirect based on role
   setTimeout(() => {
     const role = result.data.user.role;
     if (role === "staff") {
@@ -128,8 +120,12 @@ async function handleRegister(e) {
   const phone = document.getElementById("reg-phone").value.trim();
   const address = document.getElementById("reg-address").value.trim();
 
-  if (!full_name || !email || !username || !password) {
-    showAlert("Please fill in all required fields", "danger");
+  // 🆕 Idinagdag ang phone at address para required talaga lahat
+  if (!full_name || !email || !username || !password || !phone || !address) {
+    showAlert(
+      "Please fill in all required fields, including Phone and Address.",
+      "danger",
+    );
     return;
   }
 
@@ -165,13 +161,10 @@ async function handleRegister(e) {
 
   showAlert("Account created! Please verify OTP. Redirecting...", "success");
 
-  // Clear register form
   e.target.reset();
 
-  // Save email for OTP verification
   sessionStorage.setItem("registerEmail", email);
 
-  // Redirect to OTP verification
   setTimeout(() => {
     window.location.href = "verify-otp.html?type=register";
   }, 1500);
@@ -190,6 +183,7 @@ function showAlert(message, type) {
     alertEl.textContent = "";
   }, 5000);
 }
+
 // ==================== PASSWORD VISIBILITY TOGGLE ====================
 function togglePassword(fieldId, btn) {
   const input = document.getElementById(fieldId);
@@ -197,9 +191,9 @@ function togglePassword(fieldId, btn) {
 
   if (input.type === "password") {
     input.type = "text";
-    btn.textContent = "🙈"; // Monkey covering eyes = visible
+    btn.textContent = "🙈";
   } else {
     input.type = "password";
-    btn.textContent = "👁"; // Eye = hidden
+    btn.textContent = "👁";
   }
 }
