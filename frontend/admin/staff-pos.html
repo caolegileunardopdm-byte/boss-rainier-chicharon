@@ -159,6 +159,37 @@
         <section id="section-orders" class="staff-section">
           <h1 class="page-title">🛒 My Walk-in Transactions</h1>
           <div class="orders-table">
+            <!-- 🆕 BAGONG SEARCH BAR DESIGN -->
+            <div
+              style="
+                background: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px 12px 0 0;
+                border-bottom: 1px solid #e5e7eb;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+              "
+            >
+              <span style="font-size: 1.2rem">🔍</span>
+              <input
+                type="text"
+                id="order-search"
+                placeholder="Search Order ID"
+                style="
+                  width: 100%;
+                  max-width: 350px;
+                  padding: 0.5rem;
+                  border: none;
+                  font-size: 1rem;
+                  outline: none;
+                  color: var(--text-dark);
+                  background: transparent;
+                "
+                oninput="filterWalkInOrders()"
+              />
+            </div>
             <table>
               <thead>
                 <tr>

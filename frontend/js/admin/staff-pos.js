@@ -569,7 +569,7 @@ function printReceipt(order) {
 }
 
 // ============================================================
-// ORDERS (My Walk-in Transactions)
+// ORDERS (My Walk-in Transactions) - MAY SEARCH BAR NA
 // ============================================================
 async function loadOrders() {
   const tbody = document.getElementById("orders-body");
@@ -587,12 +587,37 @@ async function loadOrders() {
       (o.customer_id && o.customer_id._id === WALK_IN_CUSTOMER_ID),
   );
 
-  if (!walkInOrders.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="table-loading">Walang walk-in transactions.</td></tr>`;
+  // 🆕 I-save sa global variable para magamit sa search
+  window.currentWalkInOrders = walkInOrders;
+
+  // 🆕 I-render ang table gamit ang bagong function
+  renderWalkInOrdersTable();
+}
+
+// ============================================================
+// 🆕 RENDER WALK-IN ORDERS TABLE (May Search Filter)
+// ============================================================
+function renderWalkInOrdersTable() {
+  const tbody = document.getElementById("orders-body");
+  if (!tbody) return;
+
+  let orders = window.currentWalkInOrders || [];
+  const searchInput = document.getElementById("order-search");
+  const searchQuery = searchInput ? searchInput.value.trim().toUpperCase() : "";
+
+  // 🆕 Filter base sa search query
+  if (searchQuery) {
+    orders = orders.filter((o) =>
+      o._id.slice(-8).toUpperCase().includes(searchQuery),
+    );
+  }
+
+  if (!orders.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="table-loading">Walang nahanap na order.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = walkInOrders
+  tbody.innerHTML = orders
     .map((o) => {
       const itemsCount = (o.items || []).reduce((s, i) => s + i.quantity, 0);
       const date = new Date(o.order_date || o.createdAt).toLocaleString(
@@ -620,6 +645,11 @@ async function loadOrders() {
     `;
     })
     .join("");
+}
+
+// 🆕 FUNCTION PARA SA ONINPUT NG SEARCH BAR
+function filterWalkInOrders() {
+  renderWalkInOrdersTable();
 }
 
 // ============================================================
