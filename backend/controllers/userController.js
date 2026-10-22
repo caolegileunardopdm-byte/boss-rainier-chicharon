@@ -10,9 +10,14 @@ exports.register = async (req, res) => {
       req.body;
 
     // Check kung existing na ang email o username
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
-    });
+    // Check kung existing na ang email
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: "Email already exists",
+      });
+    }
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -120,6 +125,8 @@ exports.login = async (req, res) => {
           email: user.email,
           username: user.username,
           role: user.role,
+          phone: user.phone,
+          address: user.address,
         },
       },
     });
